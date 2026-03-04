@@ -28,7 +28,7 @@ DevContainer を使った AI 支援開発環境です。
 
 ## クイックスタート
 
-### macOS
+### ==== macOSの場合 ====
 
 Homebrew がインストールされていれば、以下のコマンドで全自動セットアップできます：
 
@@ -57,7 +57,7 @@ colima stop
 
 環境構築が完了したら、続いて「使い方」セクションを参照してください。
 
-### Windows / Linux
+### ==== Windows / Linuxの場合 ====
 
 1. **Docker のインストール**
    - Windows: [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
