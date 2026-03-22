@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.23/skills/review/scripts/resolve_review_context.py specs/requirements/ 2>&1)",
+      "Bash(bash /Users/moons/data/dev/moons/ai_tools/AI-DevContainer/.claude/doc-advisor/scripts/check_config.sh rules)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.23/scripts/session_manager.py init --skill review --review-type \"requirement\" --engine \"codex\" --auto-count 1 --current-cycle 0 2>&1)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.23/skills/reviewer/scripts/extract_review_findings.py .claude/.temp/review-3f8823/review.md .claude/.temp/review-3f8823/plan.yaml 2>&1)",
+      "Bash(for id:*)",
+      "Bash(do)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.23/scripts/session/update_plan.py .claude/.temp/review-3f8823 --id $id --status fixed --files-modified \"specs/requirements/\")",
+      "Bash(done)"
+    ]
+  },
+  "sandbox": {
+    "enabled": false,
+    "autoAllowBashIfSandboxed": false
+  }
+}

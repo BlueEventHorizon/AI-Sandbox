@@ -1,0 +1,11 @@
+# Phase 1 snapshot - used to replace .toc_checksums.yaml after merge
+# Auto-generated - do not edit
+generated_at: 2026-03-21T16:43:46Z
+file_count: 6
+checksums:
+  specs/requirements/APP-001_app_overview_spec.md: 10f149b719999f97391a8711395e1c8b020f46b3cc7b541e2d8c9186c77c029b
+  specs/requirements/FNC-001_devcontainer_environment_spec.md: 6e066d0006a6304f8e6326a71cd3178df7e57960e43a8cf75e1b9ac3716603a6
+  specs/requirements/FNC-002_container_launch_spec.md: 6cfe62f9b33b9f45f96880bb39a378542f87302065d78ae78b73722de823cc62
+  specs/requirements/FNC-003_ai_assistant_execution_spec.md: f7a96b54365523536f08a5ea195cabf04b3521457b590acf06b482010e187a35
+  specs/requirements/FNC-004_macos_docker_setup_spec.md: 80bb722dc7485fd039cbf309e27c1e174ec2b1cb6cce651682a1f513d58a13a5
+  specs/requirements/FNC-005_install_to_existing_project_spec.md: 0d10cb3edc6de1cde23a470b11c9922395b994ee2a5b867517ff08d3baf7a386
