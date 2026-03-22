@@ -4,110 +4,161 @@
 
 metadata:
   name: Project Specification Document Search Index
-  generated_at: 2026-03-21T16:44:36Z
-  file_count: 6
+  generated_at: 2026-03-22T06:56:30Z
+  file_count: 7
 
 docs:
+  specs/app_overview_writing_standard.md:
+    doc_type: spec
+    title: App Overview Writing Standard
+    purpose: Defines the required items for APP-001 application overview specification, guidelines for each item, and standardized documentation format applicable to any project type
+    content_details:
+      - Overview purpose and writing guidelines
+      - Background and motivation description
+      - Problems solved definition
+      - Project objectives with FNC-ID traceability
+      - Success criteria and verification conditions
+      - Scope definition (in-scope and out-of-scope)
+      - Target users and prerequisite knowledge
+      - Supported platforms and software versions
+      - Preconditions for deliverable usage
+      - System architecture and component relationships
+      - Usage scenarios and user workflows
+      - Main feature list and function specifications
+      - External dependencies and their risks
+      - Technical and business constraints
+      - Known risks with impact assessment
+      - Terminology definitions for project
+      - Related documentation references
+    applicable_tasks:
+      - Creating APP-001 application overview specification
+      - Standardizing project requirement definition process
+      - Initial project planning and scope confirmation
+      - Stakeholder requirement gathering and communication
+      - Project deliverable quality assurance
+    keywords:
+      - APP-001
+      - requirement definition
+      - project planning
+      - scope definition
+      - success criteria
+      - target users
+      - prerequisites
+      - external dependencies
+      - risk management
+      - deliverable specification
   specs/requirements/APP-001_app_overview_spec.md:
     doc_type: spec
-    title: AI DevContainer Application Overview Specification
-    purpose: Defines requirements, features, and setup for an AI-integrated Node.js DevContainer environment supporting Gemini CLI, Claude Code, and OpenAI Codex
+    title: APP-001 AI DevContainer Application Overview Specification
+    purpose: Defines requirements, design, and implementation scope for a DevContainer environment with preinstalled AI coding assistants (Claude Code, Gemini CLI, OpenAI Codex)
     content_details:
-      - DevContainer environment setup with VS Code integration
-      - Container execution from console without VS Code
-      - AI coding assistant execution (Gemini, Claude Code, OpenAI)
-      - macOS Docker environment setup using Colima
-      - Existing project integration support
-      - "Prerequisites: Docker and Node.js availability"
-      - "Target users: Node.js developers and team development environments"
-      - Feature definitions with requirement IDs (FNC-001 to FNC-005)
+      - DevContainer base image (Alpine Linux Node.js) and container configuration
+      - Pre-installed AI assistant tools with installation methods
+      - Five usage scenarios covering setup and daily operations
+      - Success criteria for tool availability, environment reproducibility, and OS independence
+      - Scope boundaries including macOS Docker automation (Colima), exclusions of API key setup and CI/CD integration
+      - Platform and version requirements (Docker 20.10+, VS Code with DevContainers)
+      - External dependencies and risk mitigation strategies
+      - Constraints on Alpine Linux compatibility and Homebrew-based setup
     applicable_tasks:
-      - AI DevContainer setup and configuration
-      - Container environment initialization planning
-      - Docker environment validation for macOS
-      - AI assistant tooling integration verification
-      - Team development environment standardization
-      - Existing project integration planning
+      - DevContainer environment setup and configuration
+      - AI coding assistant tool integration and preinstallation verification
+      - macOS Docker environment automation (Colima + Buildx setup)
+      - Existing project DevContainer installation
+      - Container security configuration (non-root user setup)
+      - VS Code and terminal-based container launch options
     keywords:
       - DevContainer
-      - Node.js
-      - Docker
       - AI coding assistant
-      - Gemini CLI
       - Claude Code
+      - Gemini CLI
       - OpenAI Codex
       - Colima
+      - Docker
+      - Alpine Linux
+      - Node.js
       - VS Code
-      - container
   specs/requirements/FNC-001_devcontainer_environment_spec.md:
     doc_type: spec
-    title: FNC-001 DevContainer Environment Setup Requirements Specification
-    purpose: Defines requirements for setting up an automated DevContainer environment with Alpine Linux-based Node.js 24 and AI coding assistant tools
+    title: FNC-001 DevContainer Environment Setup Specification
+    purpose: Specifies requirements for automatic DevContainer environment setup with Alpine Linux, VS Code integration, and pre-installed AI coding assistants
     content_details:
-      - Container environment requirements with Alpine Linux Node.js 24 and non-root user
-      - Automated npm dependency installation at container startup time
-      - VS Code DevContainers integration with extension recommendations
-      - Shell environment setup for AI coding assistants (Gemini, Claude, Codex)
-      - Error handling for Docker and DevContainers extension prerequisites
+      - Alpine Linux-based Node.js container environment
+      - Non-root user execution
+      - AI coding assistants pre-installation (Gemini, Claude Code, OpenAI Codex)
+      - VS Code DevContainers extension integration
+      - Cross-platform support (macOS, Windows WSL2, Linux)
+      - Command availability validation
     applicable_tasks:
       - DevContainer environment setup
-      - Development environment configuration
-      - Container build and deployment
-      - AI assistant integration
+      - Docker configuration validation
+      - AI coding assistant integration
+      - Cross-platform compatibility testing
     keywords:
       - DevContainer
       - Alpine Linux
-      - Node.js
-      - npm
-      - VS Code
-      - Gemini
-      - Claude
       - Docker
-      - Shell environment
+      - VS Code
+      - AI coding assistant
+      - Gemini
+      - Claude Code
+      - shell environment
   specs/requirements/FNC-002_container_launch_spec.md:
     doc_type: spec
-    title: Container Launch Specification
-    purpose: Defines requirements for launching DevContainer from command line with automatic dependency installation and AI assistant tool availability
+    title: FNC-002 Container Launch Specification
+    purpose: Specifies requirements for launching containers from command line with automatic shell entry and AI coding assistant availability
     content_details:
-      - Normal mode with auto-build or existing image reuse
-      - Simple mode with official Node.js image
-      - Rebuild mode for forced image reconstruction
-      - Automatic npm dependency installation on startup
+      - Normal mode with automatic image building
+      - Simple mode with official Node.js image (--node flag)
+      - Rebuild mode for forced image rebuilding (--rebuild flag)
+      - Automatic shell entry and container cleanup on exit
       - Volume mount of current directory to /workspace
-      - Error handling for Docker, Dockerfile, and build failures
+      - Help option display (-h, --help)
+      - Error handling for missing Docker, inactive Docker, missing Dockerfile, build failures, and unknown options
+      - "Platform constraint: bash script requires WSL 2 on Windows"
     applicable_tasks:
-      - Container deployment and launch configuration
-      - DevContainer setup and initialization
-      - Local development environment configuration
-      - Command line tool integration
+      - Container startup implementation
+      - Launch script development
+      - Build mode selection implementation
+      - Error handling and validation
+      - Platform-specific execution setup
     keywords:
-      - container launch
-      - DevContainer
       - Docker
-      - npm install
+      - DevContainer
+      - container launch
+      - shell entry
+      - image build
       - volume mount
-      - shell access
+      - error handling
+      - bash script
+      - WSL 2
   specs/requirements/FNC-003_ai_assistant_execution_spec.md:
     doc_type: spec
-    title: FNC-003 AI Assistant Execution Specification
-    purpose: Defines requirements for running three AI coding assistants (Gemini CLI, Claude Code, OpenAI Codex) in the container environment
+    title: AI Coding Assistant Execution Specification
+    purpose: Specifies requirements for running Claude Code as the primary AI coding assistant in the container environment, with Gemini CLI as an MCP server and OpenAI Codex as a native binary
     content_details:
-      - Supported tools (Gemini CLI, Claude Code, OpenAI Codex)
-      - Execution methods (direct, npm script, npx)
-      - Version management strategy (latest version in package.json)
-      - Security requirements (environment variables and .gitignore)
-      - Error handling cases
+      - Claude Code native binary execution via claude command
+      - Gemini CLI as MCP server for Claude Code integration
+      - OpenAI Codex native binary execution via codex command
+      - Tool installation and version management via container image builds
+      - API key and authentication management via environment variables or config files
+      - Verification methods for each tool availability
+      - Error handling for missing tools, unset API keys, and MCP connection failures
     applicable_tasks:
-      - Setting up AI assistant environment
-      - Container initialization and configuration
-      - Authentication and credential management
+      - Container image setup and configuration
+      - AI assistant tool integration and verification
+      - Development environment deployment
+      - Security configuration for API key management
     keywords:
-      - Gemini CLI
       - Claude Code
+      - Gemini CLI
       - OpenAI Codex
-      - npm install
+      - MCP server
+      - container
       - DevContainer
-      - API authentication
+      - AI assistant
+      - native binary
+      - API key authentication
   specs/requirements/FNC-004_macos_docker_setup_spec.md:
     doc_type: spec
     title: FNC-004 macOS Docker Environment Setup Requirements
@@ -132,30 +183,28 @@ docs:
       - Homebrew
   specs/requirements/FNC-005_install_to_existing_project_spec.md:
     doc_type: spec
-    title: Install to Existing Project Specification
-    purpose: Defines requirements for installing AI DevContainer environment to existing Node.js projects, including installation steps, backup handling, and merge procedures
+    title: FNC-005 Installation to Existing Project Specification
+    purpose: Defines requirements for installing AI DevContainer environment to existing projects, including installation steps, backup functionality, and confirmation prompts for file overwriting
     content_details:
-      - Installation steps in five phases
-      - DevContainer directory copy
-      - package.json merge strategy
-      - gitignore update
-      - Backup options with timestamp
-      - Overwrite confirmation prompts
-      - Mandatory vs optional file handling
-      - Error cases and recovery procedures
-      - Manual merge procedures when automatic merge fails
+      - Installation steps for .devcontainer directory, start-container.sh script, and Makefile
+      - Backup functionality with timestamp naming
+      - Confirmation prompts for existing files
+      - Mandatory file override rejection behavior
+      - Optional file override skip behavior
+      - Error handling cases for missing directory, no target specification, and rejection scenarios
     applicable_tasks:
-      - Installation feature implementation
       - Installation script development
-      - Backup mechanism design
-      - Configuration merge implementation
-      - User interaction and prompt design
-      - Error handling and validation
+      - DevContainer integration to existing projects
+      - Backup and recovery mechanism implementation
+      - User confirmation prompt implementation
+      - Error handling implementation
     keywords:
-      - installation
+      - install
       - DevContainer
-      - package.json merge
+      - existing project
       - backup
-      - configuration
-      - Node.js project
-      - setup automation
+      - override
+      - confirmation
+      - Makefile
+      - start-container.sh
+      - error handling

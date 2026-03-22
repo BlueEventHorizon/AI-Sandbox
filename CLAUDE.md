@@ -13,7 +13,7 @@ The project uses a minimal Alpine Linux-based Node.js container:
 - **Base Image**: `node:24-alpine` (.devcontainer/Dockerfile:1)
 - **Remote User**: `node` (non-root user for security)
 - **Workspace**: `/workspace` (mounted from project root)
-- **Pre-installed Tools**: npm packages defined in `package.json` (including `@google/gemini-cli`, `@anthropic-ai/claude-code`, `@openai/codex`)
+- **Pre-installed Tools**: Claude Code (native install via Dockerfile), npm packages (`@google/gemini-cli`, `@openai/codex`)
 - **VS Code Extensions**: `google.gemini-code-assist` and `Anthropic.claude-code`
 
 The DevContainer setup installs dependencies at container startup time. When using VS Code DevContainers, the `postCreateCommand` in `devcontainer.json` runs `npm install`. When using `start-container.sh`, it automatically runs `npm install` before presenting the shell.

@@ -1,11 +1,12 @@
 # Phase 1 snapshot - used to replace .toc_checksums.yaml after merge
 # Auto-generated - do not edit
-generated_at: 2026-03-21T16:43:46Z
-file_count: 6
+generated_at: 2026-03-22T06:55:40Z
+file_count: 7
 checksums:
-  specs/requirements/APP-001_app_overview_spec.md: 10f149b719999f97391a8711395e1c8b020f46b3cc7b541e2d8c9186c77c029b
-  specs/requirements/FNC-001_devcontainer_environment_spec.md: 6e066d0006a6304f8e6326a71cd3178df7e57960e43a8cf75e1b9ac3716603a6
-  specs/requirements/FNC-002_container_launch_spec.md: 6cfe62f9b33b9f45f96880bb39a378542f87302065d78ae78b73722de823cc62
-  specs/requirements/FNC-003_ai_assistant_execution_spec.md: f7a96b54365523536f08a5ea195cabf04b3521457b590acf06b482010e187a35
+  specs/app_overview_writing_standard.md: 818514220d13dd222d446f3e9091d1e172921a62d5d6ed4829ce05fcb2ec7e44
+  specs/requirements/APP-001_app_overview_spec.md: d3e5ec258e7b6c5de203e5e46508557b732fdec81cebdef8f22cf562e43100ea
+  specs/requirements/FNC-001_devcontainer_environment_spec.md: d2dbba549f031e9b0b0293862c70eb1072a0e6cc938478b3c82e1a8e86752dc7
+  specs/requirements/FNC-002_container_launch_spec.md: a95ffbc42889458ad4559d2cdc250c01f02bea4d810c499e7a239b96b52e530d
+  specs/requirements/FNC-003_ai_assistant_execution_spec.md: 5e752a01f78d654d8c9afbb0c255734684d5adacbabc2885180a3e6ad9ef0b1d
   specs/requirements/FNC-004_macos_docker_setup_spec.md: 80bb722dc7485fd039cbf309e27c1e174ec2b1cb6cce651682a1f513d58a13a5
-  specs/requirements/FNC-005_install_to_existing_project_spec.md: 0d10cb3edc6de1cde23a470b11c9922395b994ee2a5b867517ff08d3baf7a386
+  specs/requirements/FNC-005_install_to_existing_project_spec.md: 3e01b17f6f416da8e47797d79ec14c5c5b4b7b8af51423e672d4c11a81fa05c9

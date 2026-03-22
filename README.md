@@ -287,17 +287,16 @@ npm run codex -- --help   # npm script 経由
    ```json
    {
      "devDependencies": {
-       "@anthropic-ai/claude-code": "latest",
        "@google/gemini-cli": "latest",
        "@openai/codex": "latest"
      },
      "scripts": {
        "gemini": "gemini",
-       "claude": "claude",
        "codex": "codex"
      }
    }
    ```
+   ※ Claude Code は Dockerfile 内でネイティブインストールされるため、npm パッケージは不要です
 3. **推奨**: `.gitignore` に `node_modules/` を追加
 4. **推奨**: `start-container.sh`（コンソールからコンテナを起動する場合）
 5. **オプション**: `Makefile`（macOS で Docker Desktop を使わない場合）
