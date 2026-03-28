@@ -347,24 +347,12 @@ graph TD
 - **必須ツール**:
   - Homebrew
 
-### Colima メモリ要件
-
-Docker ビルド時に Claude Code のインストーラーがメモリを消費するため、Colima のメモリ割り当ては **4GiB 以上**が必要です（2GiB ではメモリ不足でインストーラーが Kill されます）。
-
-```bash
-# 4GiB のメモリを割り当てて起動
-colima start --memory 4
-```
-
-> **注意**: `make install` で初回起動する場合はデフォルトのメモリ設定で起動されます。ビルドが失敗する場合は `colima stop` してから `colima start --memory 4` で再起動してください。
-
 ### 制限事項
 
 - Linux では動作しません（Homebrew と darwin バイナリに依存）
 - Windows では動作しません
 - Homebrew がインストールされている必要があります
 - インターネット接続が必要です（Buildx のダウンロード時）
-- Colima のメモリ割り当ては 4GiB 以上が必要です（Claude Code ビルド時）
 
 ## 参考リンク
 

@@ -5,7 +5,7 @@ DevContainer を使った AI 支援開発環境です。
 
 ## 主な特徴
 
-- **AI コーディング支援**: Claude Code、OpenAI Codex が利用可能
+- **AI コーディング支援**: OpenAI Codex がコンテナ内で利用可能。Claude Code はホスト側の VS Code 拡張として使用
 - **軽量な環境**: Alpine Linux ベースのネイティブバイナリ構成（npm / Node.js 不要）
 - **一貫性**: DevContainer により、OS の違い（macOS, Linux）を問わず統一された環境で開発可能
 - **即時起動**: 全ツールがイメージにプリインストール済みのため、コンテナ起動後すぐに利用可能
@@ -44,11 +44,9 @@ make install
 
 これで Colima（Docker Desktop の無料代替）が起動します。
 
-> **重要**: Colima のメモリ割り当ては **4GiB 以上**が必要です。Claude Code のインストーラーが Docker ビルド時にメモリを消費するため、2GiB ではメモリ不足でビルドが失敗します。
-
 **2回目以降の起動：**
 ```bash
-colima start --memory 4
+colima start
 ```
 
 **停止：**
@@ -120,12 +118,11 @@ colima stop
    ターミナルで以下のコマンドが使えます：
 
    ```bash
-   # Claude Code
-   claude --help
-
-   # OpenAI Codex
+   # OpenAI Codex（コンテナ内）
    codex --help
    ```
+
+   Claude Code はホスト側の VS Code 拡張として動作するため、コンテナ内でのコマンド実行は不要です。
 
 5. **開発フロー**
 
@@ -174,7 +171,6 @@ docker run -it --rm \
 cat /etc/os-release
 
 # AI ツールが使えることを確認
-claude --help
 codex --help
 ```
 
@@ -186,19 +182,15 @@ exit
 
 ### 利用可能な AI ツール
 
-コンテナ環境内では、以下のツールが利用できます：
-
-#### Claude Code
-
-```bash
-claude --help
-```
-
-#### OpenAI Codex
+#### OpenAI Codex（コンテナ内）
 
 ```bash
 codex --help
 ```
+
+#### Claude Code（ホスト側）
+
+Claude Code はホスト（macOS）の VS Code 拡張 `Anthropic.claude-code` として動作します。コンテナ内にはインストールされません。
 
 ## 既存プロジェクトへのインストール
 
