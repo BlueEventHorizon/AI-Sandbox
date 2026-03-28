@@ -2,7 +2,7 @@
 
 ## 概要
 
-コンテナ環境内で Claude Code と OpenAI Codex の2つの AI コーディングアシスタントをネイティブバイナリとして実行する。全ツールはコンテナイメージにプリインストールされ、npm / Node.js は不要。
+コンテナ環境内で OpenAI Codex をネイティブバイナリとして実行する。Claude Code はホスト側の VS Code 拡張として使用し、コンテナ内にはインストールしない（Linux musl 環境で互換性問題があるため）。npm / Node.js は不要。
 
 ## 前提条件
 
@@ -17,15 +17,16 @@
 
 | ツール名 | インストール方法 | 利用形態 | コマンド |
 | --- | --- | --- | --- |
-| Claude Code | ネイティブバイナリ | メインの AI アシスタントとして直接実行 | `claude` |
-| OpenAI Codex | ネイティブバイナリ（musl ビルド） | 直接実行 | `codex` |
+| OpenAI Codex | ネイティブバイナリ（musl ビルド） | コンテナ内で直接実行 | `codex` |
+| Claude Code | ホスト側 VS Code 拡張 | ホスト（macOS）から VS Code 経由で使用 | VS Code 拡張 `Anthropic.claude-code` |
+
+> **注記**: Claude Code の Linux musl バイナリは Alpine Linux の musl ライブラリと互換性がないため（`posix_getdents` シンボル未対応）、コンテナ内にはインストールしない。
 
 ### 実行方法要件
 
-- Claude Code: `claude` コマンドで直接実行できること
-  - 検証方法: `claude --help` が終了コード 0 で完了すること
-- OpenAI Codex: `codex` コマンドで直接実行できること
+- OpenAI Codex: `codex` コマンドでコンテナ内から直接実行できること
   - 検証方法: `codex --help` が終了コード 0 で完了すること
+- Claude Code: ホスト側の VS Code 拡張として動作すること（コンテナ内での実行は対象外）
 
 ### バージョン管理要件
 
@@ -57,3 +58,4 @@
 | 2026-03-21 | AI | 既存ソースコードから初版作成 |
 | 2026-03-22 | AI | npm 依存を廃止し、ネイティブインストール + MCP 構成に変更 |
 | 2026-03-28 | AI | Gemini CLI 削除。Node.js/npm 完全不要化。全ツールネイティブバイナリに統一 |
+| 2026-03-28 | AI | Claude Code をコンテナから除外（Linux musl 非互換）。ホスト側 VS Code 拡張として使用 |

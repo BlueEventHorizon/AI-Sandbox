@@ -33,7 +33,6 @@ flowchart TB
 
     subgraph Container["DevContainer (Alpine Linux)"]
         Shell["sh (login shell)"]
-        Claude["Claude Code\n(~/.local/bin/claude)"]
         Codex["OpenAI Codex\n(~/.local/bin/codex)"]
     end
 
@@ -44,7 +43,6 @@ flowchart TB
 
     VSCode -->|"Reopen in Container"| Container
     Terminal --> StartSh -->|"docker run"| Container
-    Shell --> Claude
     Shell --> Codex
     MakeInstall -->|"brew install"| Colima
     MakeInstall -->|"brew install"| DockerEngine
@@ -80,9 +78,8 @@ flowchart TB
     A["FROM alpine:3.21"] --> B["RUN apk add\nlibgcc libstdc++\nripgrep curl bash"]
     B --> C["RUN adduser -D devuser\nmkdir /workspace"]
     C --> D["USER devuser"]
-    D --> E["RUN curl ... | bash\n(Claude Code インストール)"]
-    E --> F["RUN curl ... | tar xz\n(Codex バイナリ配置)"]
-    F --> G["RUN echo PATH >> ~/.profile"]
+    D --> E["RUN curl ... | tar xz\n(Codex バイナリ配置)"]
+    E --> F["RUN echo PATH >> ~/.profile"]
 ```
 
 **設計判断:**
@@ -91,7 +88,7 @@ flowchart TB
 | --- | --- | --- | --- |
 | ベースイメージ | `alpine:3.21` | 軽量（~7MB）、musl 互換ツールが利用可能 | `node:24-alpine`（~60MB、Node.js 不要なので却下） |
 | ユーザー名 | `devuser` | `node` ユーザーは Node.js イメージ固有のため変更 | `node`（Alpine にはデフォルトで存在しない） |
-| Claude Code インストール | `curl \| bash`（公式インストーラー） | 公式サポートされた唯一の方法 | 手動バイナリ配置（インストーラーが PATH 設定等も行うため非推奨） |
+| Claude Code | ホスト側 VS Code 拡張として使用（コンテナ内にはインストールしない） | Linux musl バイナリが Alpine musl と非互換（`posix_getdents` シンボル未対応） | `curl \| bash` でコンテナ内インストール（musl 非互換のため却下） |
 | Codex インストール | GitHub Releases から musl バイナリを直接取得 | npm 不要、musl 互換バイナリが公式提供 | npm install（Node.js 依存を復活させるため却下） |
 | Codex アーキテクチャ | ビルド時に `uname -m` でアーキテクチャを検出し、`x86_64-unknown-linux-musl` または `aarch64-unknown-linux-musl` を選択 | Alpine Linux は x86_64（Intel Mac / Linux）と arm64（Apple Silicon）の両方で動作する | アーキテクチャ固定（マルチアーキテクチャ対応が不可能になるため却下） |
 
@@ -99,7 +96,6 @@ flowchart TB
 
 | リスク | 緩和策 | 受容理由 |
 | --- | --- | --- |
-| `curl \| bash` による MITM / サプライチェーン攻撃 | HTTPS（TLS）経由でのみ取得。公式インストーラー以外の代替手段なし | Anthropic 公式が唯一サポートする方法であり、接続先は `claude.ai` の公式ドメイン |
 | Codex バイナリの完全性未検証 | GitHub Releases の公式アセットから HTTPS 取得 | OpenAI 公式リリースからの取得であり、現時点でチェックサムファイルが公式提供されていない |
 | Codex バージョン | latest タグの musl バイナリ | Docker Hub API または GitHub API で最新版を取得 | バージョン固定（再現性は高いが更新が手動になる） |
 | PATH 設定 | `~/.profile` に追記 | Alpine のログインシェルが `.profile` を読む | `/etc/profile.d/`（システム全体への影響を避ける） |
@@ -107,12 +103,13 @@ flowchart TB
 **Dockerfile の具体的な処理フロー:**
 
 1. Alpine 3.21 をベースイメージとする
-2. Claude Code に必要なパッケージ（libgcc, libstdc++, ripgrep, curl, bash）をインストール
+2. Codex に必要なパッケージ（libgcc, libstdc++, ripgrep, curl, bash）をインストール
 3. 非 root ユーザー `devuser` を作成し、`/workspace` ディレクトリの所有権を付与
 4. `devuser` に切り替え
-5. Claude Code を公式インストーラーでインストール（`~/.local/bin/claude` に配置される）
-6. OpenAI Codex を GitHub Releases から musl バイナリとしてダウンロードし、`~/.local/bin/codex` に配置
-7. `~/.profile` に PATH（`$HOME/.local/bin`）と環境変数（`USE_BUILTIN_RIPGREP=0`）を設定
+5. OpenAI Codex を GitHub Releases から musl バイナリとしてダウンロードし、`~/.local/bin/codex` に配置
+6. `~/.profile` に PATH（`$HOME/.local/bin`）を設定
+
+> **注記**: Claude Code はコンテナ内にインストールしない。Linux musl バイナリが Alpine の musl ライブラリと非互換（`posix_getdents` シンボル未対応）のため。ホスト側の VS Code 拡張（`Anthropic.claude-code`）として使用する。
 
 ### 3.3 devcontainer.json 設計
 
@@ -278,9 +275,8 @@ sequenceDiagram
 | テスト対象 | テスト内容 | 検証方法 |
 | --- | --- | --- |
 | Dockerfile ビルド | イメージが正常にビルドできること | `docker build` の終了コード 0 |
-| Claude Code 動作 | `claude --help` が動作すること | コンテナ内で実行、終了コード 0 |
 | Codex 動作 | `codex --help` が動作すること | コンテナ内で実行、終了コード 0 |
-| PATH 設定 | `which claude && which codex` が成功すること | ログインシェルで実行 |
+| PATH 設定 | `which codex` が成功すること | ログインシェルで実行 |
 | start-container.sh | 通常モードでコンテナ起動できること | スクリプト実行後にシェルが起動 |
 | start-container.sh --rebuild | 再ビルドモードでイメージが更新されること | ビルド実行の確認 |
 | start-container.sh --help | ヘルプが表示されること | 標準出力の確認 |
@@ -290,13 +286,9 @@ sequenceDiagram
 
 | テスト対象 | テスト内容 |
 | --- | --- |
-| VS Code DevContainer 起動 | VS Code で「Reopen in Container」→ コンテナ接続 → claude/codex 実行 |
+| VS Code DevContainer 起動 | VS Code で「Reopen in Container」→ コンテナ接続 → codex 実行 |
 | install → 起動 | install-devcontainer.sh → 対象プロジェクトで DevContainer 起動 |
 | macOS フルセットアップ | make install → colima start → docker build → コンテナ起動 → AI ツール実行 |
-
-### 6.3 Colima メモリ要件
-
-Docker ビルド時に Claude Code のインストーラーがメモリを消費するため、Colima のメモリ割り当ては **4GiB 以上**が必要（テスト済み。2GiB ではメモリ不足でインストーラーが Kill される）。
 
 ## 改定履歴
 
@@ -304,4 +296,5 @@ Docker ビルド時に Claude Code のインストーラーがメモリを消費
 | --- | --- | --- |
 | 2026-03-28 | 1.0 | 初版作成。ネイティブバイナリ方針での設計 |
 | 2026-03-28 | 1.1 | レビュー指摘反映：ステップ番号修正、現行実装との差分注記追加、セキュリティリスク受容表を追加 |
+| 2026-03-28 | 1.2 | Claude Code をコンテナから除外（Linux musl 非互換）。Codex のみコンテナ内インストールに変更。Colima 4GiB 要件を削除 |
 | 2026-03-28 | 1.2 | レビュー指摘反映：start-container.sh シーケンス図に sh -l を明記、Codex アーキテクチャ検出方針を設計判断テーブルに追加 |
