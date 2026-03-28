@@ -1,67 +1,76 @@
 # AI DevContainer
 
-DevContainer を使った AI 支援開発環境です。
-コンテナ技術により、ローカル環境を汚さず、誰でも同じ開発環境を素早く構築できます。
+AI コーディングアシスタントがすぐに使える、DevContainer ベースの開発環境です。
+
+コンテナ技術を使うことで、**ローカル環境を一切汚さず**に AI 支援開発を始められます。面倒なセットアップは不要 — コンテナを起動するだけで、すぐにコーディングを開始できます。
+
+## この環境でできること
+
+| AI ツール | 動作場所 | 説明 |
+| --- | --- | --- |
+| **OpenAI Codex** | コンテナ内 | コンテナにプリインストール済み。ターミナルから `codex` コマンドで利用 |
+| **Claude Code** | ホスト（VS Code 拡張） | VS Code の拡張機能として動作。コンテナに接続した状態で利用 |
 
 ## 主な特徴
 
-- **AI コーディング支援**: OpenAI Codex がコンテナ内で利用可能。Claude Code はホスト側の VS Code 拡張として使用
-- **軽量な環境**: Alpine Linux ベースのネイティブバイナリ構成（npm / Node.js 不要）
-- **一貫性**: DevContainer により、OS の違い（macOS, Linux）を問わず統一された環境で開発可能
-- **即時起動**: 全ツールがイメージにプリインストール済みのため、コンテナ起動後すぐに利用可能
-- **簡単セットアップ**: macOS なら `make install` で全自動、Linux でも Docker があれば OK
+- **即時利用**: コンテナを起動するだけ。追加のインストール作業は不要
+- **環境を汚さない**: すべてコンテナ内で完結。ローカル環境に影響なし
+- **軽量**: Alpine Linux ベース。npm / Node.js は使いません
+- **再現性**: 同じ Dockerfile から、誰でも同じ環境を構築できる
+- **2つの利用方法**: VS Code（推奨）でもターミナルからでも使える
 
-## 利用方法
+---
 
-この DevContainer は以下の方法で利用できます：
+## 目次
 
-### VS Code + DevContainers 拡張機能（推奨）
+- [環境構築（初回のみ）](#環境構築初回のみ)
+  - [macOS の場合](#macos-の場合)
+  - [Linux の場合](#linux-の場合)
+- [使い方](#使い方)
+  - [VS Code で使う（推奨）](#vs-code-で使う推奨)
+  - [ターミナルから使う](#ターミナルから使う)
+- [AI ツールの使い方](#ai-ツールの使い方)
+- [既存プロジェクトへの導入](#既存プロジェクトへの導入)
+- [コンテナの管理](#コンテナの管理)
+- [ファイル構成](#ファイル構成)
+- [トラブルシューティング](#トラブルシューティング)
 
-- [Visual Studio Code](https://code.visualstudio.com/)
-- [DevContainers 拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+---
 
-エディタとコンテナが統合され、最も使いやすい環境です。
+## 環境構築（初回のみ）
 
-### 直接コンテナを利用
+### 必要なもの
 
-`docker` コマンドでコンテナを起動し、シェルから AI ツールを実行できます。
-他のエディタ（Vim, Emacs, IntelliJ など）からもコンテナ内のツールにアクセス可能です。
+| ソフトウェア | 用途 | 備考 |
+| --- | --- | --- |
+| **Docker** | コンテナの実行環境 | macOS なら `make install` で自動セットアップ |
+| **Git** | リポジトリのクローン | |
+| **VS Code** + DevContainers 拡張 | （推奨）エディタとコンテナの統合 | ターミナルのみの利用なら不要 |
 
-## クイックスタート
+### macOS の場合
 
-### ==== macOSの場合 ====
-
-Homebrew がインストールされていれば、以下のコマンドで全自動セットアップできます：
+macOS では Docker Desktop の代わりに **Colima**（無料の OSS）を使います。
+Homebrew がインストールされていれば、以下のコマンドだけで全自動セットアップできます。
 
 ```bash
-# リポジトリをクローン
+# 1. リポジトリをクローン
 git clone https://github.com/BlueEventHorizon/AI-DevContainer
 cd AI-DevContainer
 
-# 全自動セットアップ（Docker CLI, Colima, Buildx を自動インストール）
+# 2. Docker 環境を全自動セットアップ（Docker CLI + Colima + Buildx）
 make install
 ```
 
-これで Colima（Docker Desktop の無料代替）が起動します。
+これだけで完了です。Colima（Docker 実行環境）が自動的に起動します。
 
-**2回目以降の起動：**
-```bash
-colima start
-```
+> **Homebrew がない場合**: 先に https://brew.sh の手順でインストールしてください。
 
-**停止：**
-```bash
-colima stop
-```
+> **詳しい解説**: `make install` の内部動作については [MAKEFILE_GUIDE.md](MAKEFILE_GUIDE.md) を参照してください。
 
-**詳細**: macOS でのセットアップの詳細は [MAKEFILE_GUIDE.md](MAKEFILE_GUIDE.md) を参照してください。
+### Linux の場合
 
-環境構築が完了したら、続いて「使い方」セクションを参照してください。
-
-### ==== Linuxの場合 ====
-
-1. **Docker のインストール**
-   - Linux: [Docker Engine](https://docs.docker.com/engine/install/)
+1. **Docker Engine をインストール**
+   - 公式ガイド: https://docs.docker.com/engine/install/
 
 2. **リポジトリをクローン**
    ```bash
@@ -69,90 +78,109 @@ colima stop
    cd AI-DevContainer
    ```
 
-これで環境構築は完了です。続いて「使い方」セクションを参照してください。
+これで環境構築は完了です。
+
+---
 
 ## 使い方
 
-### VS Code での使い方（推奨）
+### VS Code で使う（推奨）
 
-0. **前提条件: DevContainers 拡張機能**
+VS Code を使うと、エディタとコンテナが統合され、最も快適に開発できます。
 
-   DevContainers 拡張機能がインストールされている必要があります。
+#### 事前準備: DevContainers 拡張機能のインストール
 
-   **インストール方法:**
-   - VS Code で拡張機能パネルを開く（`Ctrl+Shift+X` / `Cmd+Shift+X`）
-   - 「Dev Containers」を検索
-   - **Dev Containers**（Microsoft 提供）をインストール
-   - または、[マーケットプレイス](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)から直接インストール
+VS Code に **Dev Containers** 拡張機能が必要です（初回のみ）。
 
-1. **VS Code で開く**
+1. VS Code を開く
+2. 拡張機能パネルを開く（`Cmd+Shift+X`）
+3. 「**Dev Containers**」を検索
+4. Microsoft 提供の「**Dev Containers**」をインストール
 
-   VS Code でプロジェクトフォルダを開くと、**右下に通知が表示**されます：
+または [マーケットプレイス](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) から直接インストールできます。
+
+#### コンテナを起動する
+
+1. **VS Code でプロジェクトフォルダを開く**
+
+   ```bash
+   code AI-DevContainer
+   ```
+
+2. **コンテナで再度開く**
+
+   VS Code の右下に以下の通知が表示されます：
 
    ```
    ファイルに開発コンテナーの構成ファイルが含まれています
    [コンテナーで再度開く]  [ボリュームでクローン]  [再表示しない...]
    ```
 
-   **「コンテナーで再度開く」**（英語版: `Reopen in Container`）をクリックしてください。
+   **「コンテナーで再度開く」** をクリックしてください。
 
-   **通知が表示されない場合:**
-   - コマンドパレット（`Ctrl+Shift+P` / `Cmd+Shift+P`）を開く
-   - 「Dev Containers: Reopen in Container」を検索して実行
+   > 通知が表示されない場合は、コマンドパレット（`Cmd+Shift+P`）を開き、「**Dev Containers: Reopen in Container**」を検索して実行してください。
 
-   コンテナのビルドが完了すると、VS Code がコンテナに接続された状態で再起動します。
+3. **初回はビルドが実行される**
 
-2. **コンテナ接続の確認**
+   初回はコンテナイメージのビルドが行われるため、数分かかります（2回目以降はキャッシュが効くため高速です）。VS Code の左下に進捗が表示されます。
 
-   VS Code の左下のステータスバーに「**Dev Container: ...**」と表示されていれば、コンテナに接続されています。
+4. **接続を確認する**
 
-3. **統合ターミナルを開く**
+   ビルドが完了すると、VS Code がコンテナに接続された状態で再起動します。
+   左下のステータスバーに **「Dev Container: ai-dev-container」** と表示されていれば成功です。
 
-   - メニュー: `Terminal` → `New Terminal`
-   - ショートカット: `Ctrl+\`` (Windows/Linux) or `Cmd+\`` (macOS)
+#### コンテナ内でターミナルを使う
 
-   ターミナルが開くと、コンテナ内のシェルが起動します。
+メニューの `Terminal` → `New Terminal`、またはショートカット `` Cmd+` `` でターミナルを開きます。
 
-4. **AI ツールを実行**
+```
+/workspace $
+```
 
-   ターミナルで以下のコマンドが使えます：
-
-   ```bash
-   # OpenAI Codex（コンテナ内）
-   codex --help
-   ```
-
-   Claude Code はホスト側の VS Code 拡張として動作するため、コンテナ内でのコマンド実行は不要です。
-
-5. **開発フロー**
-
-   - エディタでコードを編集
-   - ターミナルで AI ツールに質問やコード生成を依頼
-   - AI の回答を参考にコーディングを進める
-
-### コンソールでの使い方（VS Code なし）
-
-VS Code を使わず、直接コンテナを起動して使うこともできます。
-
-**方法1: 起動スクリプトを使用（最も簡単）**
-
-便利な起動スクリプトを用意しています：
+このプロンプトが表示されていれば、コンテナ内のシェルです。ここで AI ツールを実行できます。
 
 ```bash
-# DevContainer を起動（イメージがなければ自動ビルド）
+# Codex が使えることを確認
+codex --help
+```
+
+#### コンテナを終了する
+
+VS Code のコマンドパレット（`Cmd+Shift+P`）から「**Dev Containers: Reopen Folder Locally**」を実行すると、ローカル環境に戻ります。
+
+---
+
+### ターミナルから使う
+
+VS Code を使わず、ターミナルから直接コンテナを操作することもできます。
+
+#### 方法 1: 起動スクリプトを使う（簡単）
+
+プロジェクトに同梱の `start-container.sh` を使います。
+
+```bash
+# コンテナを起動（初回は自動でイメージをビルド）
 ./start-container.sh
 
-# DevContainer を再ビルドして起動
+# イメージを強制的に再ビルドして起動
 ./start-container.sh --rebuild
 
 # ヘルプを表示
 ./start-container.sh --help
 ```
 
-**方法2: Docker コマンドで直接起動**
+起動すると、コンテナ内のシェルに入ります：
+
+```
+/workspace $
+```
+
+`exit` でコンテナから抜けます（コンテナは自動削除されます）。
+
+#### 方法 2: Docker コマンドを直接使う
 
 ```bash
-# コンテナイメージをビルド
+# イメージをビルド（初回のみ）
 docker build -t ai-devcontainer -f .devcontainer/Dockerfile .
 
 # コンテナを起動してシェルに入る
@@ -162,76 +190,184 @@ docker run -it --rm \
   ai-devcontainer sh -l
 ```
 
-コンテナに入ると、プロンプトが `/workspace $` のように変わります。
+> **`sh -l` について**: `-l` はログインシェルを意味します。これにより `~/.profile` が読み込まれ、`codex` コマンドに PATH が通ります。`-l` を付けないと `codex: not found` になるので注意してください。
 
-**コンテナ内にいることを確認:**
+---
+
+## AI ツールの使い方
+
+### OpenAI Codex（コンテナ内）
+
+コンテナ内のターミナルから `codex` コマンドで利用します。
 
 ```bash
-# Alpine Linux であることを確認
-cat /etc/os-release
-
-# AI ツールが使えることを確認
+# ヘルプを表示
 codex --help
+
+# 対話モードで起動
+codex
+
+# プロンプトを直接指定して実行
+codex "このプロジェクトの構造を説明して"
+
+# コードレビューを実行
+codex review
 ```
 
-**コンテナから抜ける:**
+> **注意**: Codex の利用には OpenAI の API キーが必要です。初回実行時に `codex login` で認証を行ってください。
 
-```bash
-exit
-```
+### Claude Code（ホスト側 VS Code 拡張）
 
-### 利用可能な AI ツール
+Claude Code は VS Code の拡張機能 **Anthropic.claude-code** としてホスト側で動作します。
+DevContainer に接続した状態で VS Code から直接利用できます。
 
-#### OpenAI Codex（コンテナ内）
+コンテナ内にはインストールされないため、ターミナルから `claude` コマンドは使えません。
 
-```bash
-codex --help
-```
+> **拡張機能の自動推奨**: DevContainer に接続すると、`Anthropic.claude-code` 拡張のインストールが自動的に推奨されます（`.devcontainer/devcontainer.json` で設定済み）。
 
-#### Claude Code（ホスト側）
+---
 
-Claude Code はホスト（macOS）の VS Code 拡張 `Anthropic.claude-code` として動作します。コンテナ内にはインストールされません。
+## 既存プロジェクトへの導入
 
-## 既存プロジェクトへのインストール
-
-この AI DevContainer 環境を既存のプロジェクトに追加できます。
+この AI DevContainer 環境を、既存のプロジェクトに追加できます。
 
 ### 自動インストール（推奨）
 
-インストールスクリプトを使用して自動的にセットアップできます：
-
 ```bash
-# 基本的な使い方
+# AI-DevContainer リポジトリのディレクトリで実行
 ./install-devcontainer.sh /path/to/your/project
 
 # 既存ファイルをバックアップしながらインストール
 ./install-devcontainer.sh --backup /path/to/your/project
 ```
 
-スクリプトは以下の処理を自動で行います：
+スクリプトは以下の **2つのファイルだけ** をコピーします：
 
-1. `.devcontainer/` ディレクトリのコピー
-2. `start-container.sh` のコピー（コンソールからの起動用）
+| ステップ | コピー対象 | 必須/任意 | 説明 |
+| --- | --- | --- | --- |
+| [1/2] | `.devcontainer/` | 必須 | Dockerfile と devcontainer.json |
+| [2/2] | `start-container.sh` | 任意 | ターミナルからの起動用スクリプト |
 
 ### 手動インストール
 
-手動でインストールする場合は、以下のファイルをコピーしてください：
+手動で行う場合は、以下をコピーしてください：
 
-1. **必須**: `.devcontainer/` ディレクトリ全体
-2. **推奨**: `start-container.sh`（コンソールからコンテナを起動する場合）
+1. **`.devcontainer/`** ディレクトリ全体（必須）
+2. **`start-container.sh`**（ターミナルから使う場合）
 
-インストール後、VS Code でプロジェクトを開き、「Dev Containers: Reopen in Container」を実行してください。
+コピー後、対象プロジェクトを VS Code で開き、「Dev Containers: Reopen in Container」を実行すれば利用開始できます。
+
+---
+
+## コンテナの管理
+
+### Docker 環境の起動・停止（macOS / Colima）
+
+```bash
+# Colima を起動（Docker 環境が使えるようになる）
+colima start
+
+# Colima を停止
+colima stop
+```
+
+### コンテナイメージの再ビルド
+
+AI ツールを更新したい場合や、Dockerfile を変更した場合はイメージを再ビルドします。
+
+**VS Code の場合:**
+- コマンドパレット（`Cmd+Shift+P`）→「**Dev Containers: Rebuild Container**」
+
+**ターミナルの場合:**
+```bash
+./start-container.sh --rebuild
+```
+
+### Docker 環境の完全削除（macOS）
+
+```bash
+make uninstall
+```
+
+Colima、Docker CLI、Buildx プラグインがすべて削除されます。
+
+---
 
 ## ファイル構成
 
-- **`.devcontainer/`**: DevContainer の設定ファイル
-  - `devcontainer.json`: 拡張機能、ビルド方法などを定義
-  - `Dockerfile`: コンテナのベースイメージ（Alpine Linux）と AI ツールのインストールを定義
-- **`start-container.sh`**: コンソールからコンテナを起動するスクリプト
-- **`install-devcontainer.sh`**: 既存プロジェクトへの自動インストールスクリプト
-- **`Makefile`**: (macOS ユーザー向け) Docker Desktop の代替として Colima をセットアップ
+```
+AI-DevContainer/
+├── .devcontainer/
+│   ├── Dockerfile           # コンテナイメージの定義（Alpine Linux + Codex）
+│   └── devcontainer.json    # VS Code DevContainer の設定
+├── start-container.sh       # ターミナルからコンテナを起動するスクリプト
+├── install-devcontainer.sh  # 既存プロジェクトへのインストールスクリプト
+├── Makefile                 # macOS 向け Docker 環境の自動セットアップ
+├── MAKEFILE_GUIDE.md        # Makefile の詳しい解説
+├── CLAUDE.md                # Claude Code 向けのプロジェクト情報
+└── README.md                # このファイル
+```
+
+---
+
+## トラブルシューティング
+
+### 「Docker is not running」と表示される
+
+Docker（Colima）が起動していません。
+
+```bash
+# macOS の場合
+colima start
+
+# Linux の場合
+sudo systemctl start docker
+```
+
+### コンテナ内で `codex: not found` と表示される
+
+ログインシェルで起動していない可能性があります。
+
+```bash
+# sh -l（ログインシェル）で起動し直す
+sh -l
+
+# PATH が通っているか確認
+which codex
+```
+
+`start-container.sh` または VS Code の DevContainer 機能を使えば、自動的にログインシェルで起動します。
+
+### VS Code で「Reopen in Container」が表示されない
+
+- **Dev Containers 拡張機能** がインストールされているか確認してください
+- コマンドパレット（`Cmd+Shift+P`）から手動で「Dev Containers: Reopen in Container」を実行できます
+- `.devcontainer/` ディレクトリがプロジェクトルートに存在するか確認してください
+
+### コンテナのビルドが失敗する
+
+ネットワーク接続を確認し、再ビルドしてください：
+
+```bash
+# キャッシュなしで再ビルド
+docker build --no-cache -t ai-devcontainer -f .devcontainer/Dockerfile .
+```
+
+### macOS で `make install` が失敗する
+
+Homebrew がインストールされているか確認してください：
+
+```bash
+brew --version
+```
+
+Homebrew がない場合は、先に https://brew.sh の手順でインストールしてください。
+
+---
 
 ## 参考情報
 
-- [MAKEFILE_GUIDE.md](MAKEFILE_GUIDE.md): macOS での Colima セットアップの詳細
-- [CLAUDE.md](CLAUDE.md): Claude Code 向けのプロジェクト情報
+- [MAKEFILE_GUIDE.md](MAKEFILE_GUIDE.md) — macOS での Colima セットアップの詳しい解説
+- [CLAUDE.md](CLAUDE.md) — Claude Code 向けのプロジェクト情報
+- [VS Code Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) — DevContainers の公式ドキュメント
+- [OpenAI Codex](https://github.com/openai/codex) — Codex の公式リポジトリ
