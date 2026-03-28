@@ -134,7 +134,7 @@ tasks:
   - task_id: TASK-005
     title: package.json 削除
     priority: 70
-    status: pending
+    status: completed
     design_id: DES-001
     depends_on:
       - TASK-002
