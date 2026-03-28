@@ -5,10 +5,11 @@ DevContainer を使った AI 支援開発環境です。
 
 ## 主な特徴
 
-- **AI コーディング支援**: Gemini CLI、Claude Code、OpenAI Codex が利用可能
-- **軽量な環境**: Alpine Linux ベースの Node.js 24 環境
-- **一貫性**: DevContainer により、OS の違い（macOS, Windows, Linux）を問わず統一された環境で開発可能
-- **簡単セットアップ**: macOS なら `make install` で全自動、他の OS でも VS Code で開くだけ
+- **AI コーディング支援**: Claude Code、OpenAI Codex が利用可能
+- **軽量な環境**: Alpine Linux ベースのネイティブバイナリ構成（npm / Node.js 不要）
+- **一貫性**: DevContainer により、OS の違い（macOS, Linux）を問わず統一された環境で開発可能
+- **即時起動**: 全ツールがイメージにプリインストール済みのため、コンテナ起動後すぐに利用可能
+- **簡単セットアップ**: macOS なら `make install` で全自動、Linux でも Docker があれば OK
 
 ## 利用方法
 
@@ -43,9 +44,11 @@ make install
 
 これで Colima（Docker Desktop の無料代替）が起動します。
 
+> **重要**: Colima のメモリ割り当ては **4GiB 以上**が必要です。Claude Code のインストーラーが Docker ビルド時にメモリを消費するため、2GiB ではメモリ不足でビルドが失敗します。
+
 **2回目以降の起動：**
 ```bash
-colima start
+colima start --memory 4
 ```
 
 **停止：**
@@ -57,10 +60,9 @@ colima stop
 
 環境構築が完了したら、続いて「使い方」セクションを参照してください。
 
-### ==== Windows / Linuxの場合 ====
+### ==== Linuxの場合 ====
 
 1. **Docker のインストール**
-   - Windows: [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
    - Linux: [Docker Engine](https://docs.docker.com/engine/install/)
 
 2. **リポジトリをクローン**
@@ -118,17 +120,11 @@ colima stop
    ターミナルで以下のコマンドが使えます：
 
    ```bash
-   # Gemini CLI
-   gemini --help
-   npm run gemini -- --help
-
    # Claude Code
    claude --help
-   npm run claude -- --help
 
    # OpenAI Codex
    codex --help
-   npm run codex -- --help
    ```
 
 5. **開発フロー**
@@ -141,16 +137,13 @@ colima stop
 
 VS Code を使わず、直接コンテナを起動して使うこともできます。
 
-**方法0: 起動スクリプトを使用（最も簡単）**
+**方法1: 起動スクリプトを使用（最も簡単）**
 
 便利な起動スクリプトを用意しています：
 
 ```bash
 # DevContainer を起動（イメージがなければ自動ビルド）
 ./start-container.sh
-
-# シンプルな Node.js コンテナを起動
-./start-container.sh --node
 
 # DevContainer を再ビルドして起動
 ./start-container.sh --rebuild
@@ -159,20 +152,20 @@ VS Code を使わず、直接コンテナを起動して使うこともできま
 ./start-container.sh --help
 ```
 
-**方法1: DevContainer イメージを使用**
+**方法2: Docker コマンドで直接起動**
 
 ```bash
 # コンテナイメージをビルド
 docker build -t ai-devcontainer -f .devcontainer/Dockerfile .
 
-# コンテナを起動してシェルに入る（依存関係を自動インストール）
+# コンテナを起動してシェルに入る
 docker run -it --rm \
   -v "$(pwd)":/workspace \
   -w /workspace \
-  ai-devcontainer sh -c "npm install --silent 2>/dev/null || true; exec sh -l"
+  ai-devcontainer sh -l
 ```
 
-コンテナに入ると、プロンプトが `/workspace #` のように変わります。
+コンテナに入ると、プロンプトが `/workspace $` のように変わります。
 
 **コンテナ内にいることを確認:**
 
@@ -180,47 +173,9 @@ docker run -it --rm \
 # Alpine Linux であることを確認
 cat /etc/os-release
 
-# Node.js 24 がインストールされていることを確認
-node --version
-
 # AI ツールが使えることを確認
-gemini --help
 claude --help
 codex --help
-```
-
-**コンテナから抜ける:**
-
-```bash
-exit
-```
-
-**方法2: シンプルな Node.js コンテナを使用**
-
-```bash
-# Node.js コンテナを起動（依存関係を自動インストール）
-docker run -it --rm \
-  -v "$(pwd)":/workspace \
-  -w /workspace \
-  node:24-alpine sh -c "npm install --silent 2>/dev/null || true; exec sh -l"
-```
-
-コンテナに入ると、プロンプトが `/workspace #` のように変わります。
-
-**コンテナ内での作業:**
-
-依存関係は起動時に自動的にインストールされるので、すぐにAIツールが使えます：
-
-```bash
-# AI ツールを直接実行（エイリアスが有効）
-gemini --help
-claude --help
-codex --help
-
-# または npx 経由でも実行可能
-npx gemini --help
-npx claude --help
-npx codex --help
 ```
 
 **コンテナから抜ける:**
@@ -233,25 +188,16 @@ exit
 
 コンテナ環境内では、以下のツールが利用できます：
 
-#### Gemini CLI
-
-```bash
-gemini --help        # 直接実行
-npm run gemini -- --help  # npm script 経由
-```
-
 #### Claude Code
 
 ```bash
-claude --help        # 直接実行
-npm run claude -- --help  # npm script 経由
+claude --help
 ```
 
 #### OpenAI Codex
 
 ```bash
-codex --help         # 直接実行
-npm run codex -- --help   # npm script 経由
+codex --help
 ```
 
 ## 既存プロジェクトへのインストール
@@ -273,47 +219,25 @@ npm run codex -- --help   # npm script 経由
 スクリプトは以下の処理を自動で行います：
 
 1. `.devcontainer/` ディレクトリのコピー
-2. `package.json` の自動マージ（既存の場合は devDependencies と scripts を追加）
-3. `.gitignore` の確認と更新（`node_modules/` の追加）
-4. `start-container.sh` のコピー（コンソールからの起動用）
-5. `Makefile` のコピー（オプション、macOS ユーザー向け）
+2. `start-container.sh` のコピー（コンソールからの起動用）
 
 ### 手動インストール
 
 手動でインストールする場合は、以下のファイルをコピーしてください：
 
 1. **必須**: `.devcontainer/` ディレクトリ全体
-2. **必須**: `package.json` に以下を追加（既存ファイルがある場合はマージ）
-   ```json
-   {
-     "devDependencies": {
-       "@google/gemini-cli": "latest",
-       "@openai/codex": "latest"
-     },
-     "scripts": {
-       "gemini": "gemini",
-       "codex": "codex"
-     }
-   }
-   ```
-   ※ Claude Code は Dockerfile 内でネイティブインストールされるため、npm パッケージは不要です
-3. **推奨**: `.gitignore` に `node_modules/` を追加
-4. **推奨**: `start-container.sh`（コンソールからコンテナを起動する場合）
-5. **オプション**: `Makefile`（macOS で Docker Desktop を使わない場合）
+2. **推奨**: `start-container.sh`（コンソールからコンテナを起動する場合）
 
 インストール後、VS Code でプロジェクトを開き、「Dev Containers: Reopen in Container」を実行してください。
 
 ## ファイル構成
 
 - **`.devcontainer/`**: DevContainer の設定ファイル
-  - `devcontainer.json`: ポート、拡張機能、ビルド方法などを定義
-  - `Dockerfile`: コンテナのベースイメージとインストールするソフトウェアを定義
-- **`package.json`**: プロジェクトの依存関係と npm スクリプトを定義
+  - `devcontainer.json`: 拡張機能、ビルド方法などを定義
+  - `Dockerfile`: コンテナのベースイメージ（Alpine Linux）と AI ツールのインストールを定義
 - **`start-container.sh`**: コンソールからコンテナを起動するスクリプト
 - **`install-devcontainer.sh`**: 既存プロジェクトへの自動インストールスクリプト
 - **`Makefile`**: (macOS ユーザー向け) Docker Desktop の代替として Colima をセットアップ
-- **`.vscode/`**: VS Code エディタ固有の設定
-  - `extensions.json`: このプロジェクトで推奨される VS Code 拡張機能を定義
 
 ## 参考情報
 

@@ -151,7 +151,7 @@ tasks:
   - task_id: TASK-006
     title: CLAUDE.md・README.md のネイティブ方針への更新
     priority: 30
-    status: pending
+    status: completed
     design_id: DES-001
     depends_on:
       - TASK-001

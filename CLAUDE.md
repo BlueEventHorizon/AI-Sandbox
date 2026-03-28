@@ -4,52 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a general-purpose VS Code DevContainer sample project for Node.js development with AI coding assistants. The project demonstrates how to set up a consistent development environment using DevContainers, allowing developers to use AI tools like Gemini CLI, Claude Code, and OpenAI Codex without polluting their local environment.
+This is a general-purpose VS Code DevContainer sample project for AI-assisted development. The project provides a consistent development environment using DevContainers with Alpine Linux and native binaries, allowing developers to use AI tools (Claude Code, OpenAI Codex) without polluting their local environment. npm / Node.js is not used.
 
 ## DevContainer Architecture
 
-The project uses a minimal Alpine Linux-based Node.js container:
+The project uses a minimal Alpine Linux container with native binaries:
 
-- **Base Image**: `node:24-alpine` (.devcontainer/Dockerfile:1)
-- **Remote User**: `node` (non-root user for security)
+- **Base Image**: `alpine:3.21` (.devcontainer/Dockerfile)
+- **Remote User**: `devuser` (non-root user for security)
 - **Workspace**: `/workspace` (mounted from project root)
-- **Pre-installed Tools**: Claude Code (native install via Dockerfile), npm packages (`@google/gemini-cli`, `@openai/codex`)
-- **VS Code Extensions**: `google.gemini-code-assist` and `Anthropic.claude-code`
+- **Pre-installed Tools**: Claude Code (native binary via official installer), OpenAI Codex (musl binary from GitHub Releases)
+- **VS Code Extensions**: `Anthropic.claude-code`
+- **PATH**: `~/.local/bin` (set via `ENV` instruction and `~/.profile`)
+- **Environment Variable**: `USE_BUILTIN_RIPGREP=0`
 
-The DevContainer setup installs dependencies at container startup time. When using VS Code DevContainers, the `postCreateCommand` in `devcontainer.json` runs `npm install`. When using `start-container.sh`, it automatically runs `npm install` before presenting the shell.
+All tools are pre-installed during the Docker image build. No `postCreateCommand` or runtime installation steps are needed. There is no `package.json` or `node_modules` in this project.
 
 ## Common Commands
 
 ### Using AI Coding Assistants
 
-#### Gemini CLI
-
-```bash
-# Direct command
-gemini --help
-
-# Via npm script
-npm run gemini -- --help
-```
-
 #### Claude Code
 
 ```bash
-# Direct command
 claude --help
-
-# Via npm script
-npm run claude -- --help
 ```
 
 #### OpenAI Codex
 
 ```bash
-# Direct command
 codex --help
-
-# Via npm script
-npm run codex -- --help
 ```
 
 ### Container Management (macOS alternative to Docker Desktop)
@@ -58,8 +42,8 @@ npm run codex -- --help
 # Initial setup (installs Docker, Colima, buildx plugin)
 make install
 
-# Start Colima (after initial setup)
-colima start
+# Start Colima (after initial setup, 4GiB or more memory required)
+colima start --memory 4
 
 # Stop Colima
 colima stop
@@ -68,19 +52,17 @@ colima stop
 make uninstall
 ```
 
+> **Note**: Docker build for Claude Code installer requires 4GiB or more memory. Use `colima start --memory 4` instead of plain `colima start`.
+
 ### DevContainer Operations
 
-To rebuild the container after changing `.devcontainer/Dockerfile` or `package.json`:
+To rebuild the container after changing `.devcontainer/Dockerfile`:
 - Use Command Palette: `Dev Containers: Rebuild Container`
 
 ## Environment Setup Notes
 
 **macOS Users Without Docker Desktop**: This project includes a `Makefile` with automation for setting up Colima as a Docker Desktop alternative. The `make install` command handles installation and configuration of Docker CLI, Colima, and the buildx plugin.
 
-**Recommended VS Code Extensions**: The DevContainer automatically suggests installing AI coding assistants: `google.gemini-code-assist` and `Anthropic.claude-code` (.devcontainer/devcontainer.json:10-13).
+**Recommended VS Code Extension**: The DevContainer automatically suggests installing `Anthropic.claude-code` (.devcontainer/devcontainer.json).
 
-## Modifying Dependencies
-
-When adding new npm packages:
-1. Update `package.json`
-2. Restart the container or run `npm install` manually (packages are installed at container startup, not during build)
+**Colima Memory Requirement**: When using Colima, allocate at least 4GiB of memory (`colima start --memory 4`). The Claude Code installer consumes significant memory during Docker build, and 2GiB is insufficient.
