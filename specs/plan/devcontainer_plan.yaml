@@ -1,0 +1,204 @@
+# devcontainer ネイティブインストール方針 実装計画書
+
+# === トレーサビリティ ===
+requirements_traceability:
+  - requirement_id: APP-001
+    title: AI DevContainer アプリケーション概要
+    design_id: DES-001
+    status: pending
+
+  - requirement_id: FNC-001
+    title: DevContainer 環境構築（VS Code 連携）
+    design_id: DES-001
+    status: pending
+
+  - requirement_id: FNC-002
+    title: コンテナ起動（コンソール）
+    design_id: DES-001
+    status: pending
+
+  - requirement_id: FNC-003
+    title: AI コーディングアシスタント実行環境
+    design_id: DES-001
+    status: pending
+
+  # FNC-004: 設計書 DES-001 §3.6 で「Makefile は変更不要」と判断済み。
+  # 対応タスクなし。MAKEFILE_GUIDE.md への Colima メモリ要件追記のみ TASK-006 で対応。
+  - requirement_id: FNC-004
+    title: macOS Docker 環境セットアップ
+    design_id: DES-001
+    status: pending
+
+  - requirement_id: FNC-005
+    title: 既存プロジェクトへのインストール
+    design_id: DES-001
+    status: pending
+
+design_traceability:
+  - design_id: DES-001
+    title: AI DevContainer 設計書
+    requirement_ids:
+      - APP-001
+      - FNC-001
+      - FNC-002
+      - FNC-003
+      - FNC-004
+      - FNC-005
+    task_ids:
+      - TASK-001
+      - TASK-002
+      - TASK-003
+      - TASK-004
+      - TASK-005
+      - TASK-006
+      - TASK-007
+
+# === タスク一覧 ===
+tasks:
+  - task_id: TASK-001
+    title: Dockerfile 全面書き換え（Alpine ネイティブ）
+    priority: 95
+    status: completed
+    design_id: DES-001
+    depends_on: []
+    group_id: null
+    build_check: per_task
+    description:
+      - ベースイメージを alpine:3.21 に変更（node:24-alpine から）
+      - 必要システムパッケージを apk add でインストール（DES-001 §3.2 ステップ 2）
+      - 非 root ユーザー devuser を作成し /workspace の所有権を付与（§3.2 ステップ 3）
+      - USER devuser に切り替え（§3.2 ステップ 4）
+      - Claude Code を公式インストーラー（curl|bash）でインストール（§3.2 ステップ 5）
+      - OpenAI Codex を GitHub Releases の musl バイナリとして ~/.local/bin/codex に配置（§3.2 ステップ 6）
+      - ~/.profile に PATH=$HOME/.local/bin と USE_BUILTIN_RIPGREP=0 を設定（§3.2 ステップ 7）
+      - 旧方式の gemini/codex エイリアス、node_modules PATH を削除
+    acceptance_criteria: "docker build が成功し、コンテナ内で sh -l -c 'claude --help && codex --help' が終了コード 0 で実行できること"
+    required_reading:
+      - specs/design/DES-001_devcontainer_design.md
+
+  - task_id: TASK-002
+    title: devcontainer.json 修正
+    priority: 85
+    status: completed
+    design_id: DES-001
+    depends_on:
+      - TASK-001
+    group_id: null
+    build_check: per_task
+    description:
+      - remoteUser を node から devuser に変更（DES-001 §3.3）
+      - postCreateCommand（npm install）を削除
+      - VS Code 拡張機能から google.gemini-code-assist を削除
+    acceptance_criteria: "VS Code で Reopen in Container が成功し、devuser でシェルに入れること"
+    required_reading:
+      - specs/design/DES-001_devcontainer_design.md
+
+  - task_id: TASK-003
+    title: start-container.sh 修正
+    priority: 80
+    status: completed
+    design_id: DES-001
+    depends_on:
+      - TASK-001
+    group_id: null
+    build_check: per_task
+    description:
+      - --node モードを削除（DES-001 §3.4「削除する機能」）
+      - npm install の実行箇所を削除（起動コマンドから npm install --silent を除去）
+      - --rebuild モードと通常モードのみに整理
+    acceptance_criteria: "./start-container.sh --help が npm install 関連の記述なしで表示され、通常起動でコンテナに入れること"
+    required_reading:
+      - specs/design/DES-001_devcontainer_design.md
+      - specs/requirements/FNC-002_container_launch_spec.md
+
+  - task_id: TASK-004
+    title: install-devcontainer.sh 2ステップへの簡素化
+    priority: 75
+    status: completed
+    design_id: DES-001
+    depends_on:
+      - TASK-001
+    group_id: null
+    build_check: per_task
+    description:
+      - package.json マージ処理を削除（DES-001 §3.5「削除する処理」）
+      - .gitignore への node_modules 追加処理を削除
+      - Makefile コピー処理を削除
+      - ステップ表示を [1/2][2/2] に修正
+      - Gemini CLI への残存参照を除去
+    acceptance_criteria: "./install-devcontainer.sh /tmp/test で .devcontainer/ と start-container.sh の 2 ファイルのみがコピーされること。かつ start-container.sh に実行権限が付与されていること（test -x /tmp/test/start-container.sh）"
+    required_reading:
+      - specs/design/DES-001_devcontainer_design.md
+      - specs/requirements/FNC-005_install_to_existing_project_spec.md
+
+  - task_id: TASK-005
+    title: package.json 削除
+    priority: 70
+    status: pending
+    design_id: DES-001
+    depends_on:
+      - TASK-002
+      - TASK-003
+    group_id: null
+    build_check: per_task
+    description:
+      - package.json を削除（npm 依存なしのため不要）
+      - package-lock.json が存在する場合は合わせて削除
+    acceptance_criteria: "package.json / package-lock.json がリポジトリルートに存在しないこと（git ls-files で確認）"
+    required_reading:
+      - specs/design/DES-001_devcontainer_design.md
+
+  - task_id: TASK-006
+    title: CLAUDE.md・README.md のネイティブ方針への更新
+    priority: 30
+    status: pending
+    design_id: DES-001
+    depends_on:
+      - TASK-001
+      - TASK-002
+      - TASK-003
+      - TASK-004
+      - TASK-005
+    group_id: null
+    build_check: per_task
+    description:
+      - CLAUDE.md をネイティブバイナリ方針の新アーキテクチャに全面更新（ベースイメージ、ユーザー名、ツール一覧、コマンド例など）
+      - README.md を新方式に更新（npm install 手順を削除、Codex/Claude Code の使い方を更新）
+      - MAKEFILE_GUIDE.md の内容を確認し、Colima メモリ要件（4GiB 以上）が記載されていなければ追記
+      - .gitignore に API キー関連ファイル（.env 等）が含まれているか確認し、なければ追加（FNC-003 セキュリティ要件）
+    acceptance_criteria: "CLAUDE.md・README.md に npm、node_modules、gemini-cli、@google/gemini-cli、@openai/codex 等の旧方式への言及がないこと。MAKEFILE_GUIDE.md に Colima 4GiB 以上の記述が含まれること。.gitignore に .env が含まれること"
+    required_reading:
+      - specs/design/DES-001_devcontainer_design.md
+      - specs/requirements/APP-001_app_overview_spec.md
+      - specs/requirements/FNC-003_ai_assistant_execution_spec.md
+
+  - task_id: TASK-007
+    title: 統合検証（エンドツーエンドテスト）
+    priority: 20
+    status: pending
+    design_id: DES-001
+    depends_on:
+      - TASK-001
+      - TASK-002
+      - TASK-003
+      - TASK-004
+      - TASK-005
+      - TASK-006
+    group_id: null
+    build_check: per_task
+    description:
+      - docker build で全体ビルドが成功することを確認（DES-001 §6.1）
+      - コンテナ内で claude --help、codex --help が成功することを確認
+      - start-container.sh 通常起動・--rebuild 起動・--help 表示が正常動作することを確認（DES-001 §6.1）
+      - install-devcontainer.sh で2ファイルのみコピーされることを確認
+      - VS Code「Reopen in Container」で devuser としてシェルに入れることを確認（手動テスト）
+    acceptance_criteria: "DES-001 §6.1 の全単体テストが成功すること。DES-001 §6.2 の統合テスト（VS Code DevContainer 起動、install → 起動）が正常完了すること"
+    required_reading:
+      - specs/design/DES-001_devcontainer_design.md
+
+# === 改定履歴 ===
+revision_history:
+  - date: "2026-03-28"
+    content: 初版作成。ネイティブバイナリ方針（alpine:3.21 + devuser）への移行タスクを定義
+  - date: "2026-03-28"
+    content: レビュー指摘反映。TASK-001/003/004 の acceptance_criteria 修正、depends_on 追加、TASK-007（統合検証）追加、FNC-003 .gitignore 対応を TASK-006 に追記

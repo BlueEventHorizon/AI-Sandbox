@@ -19,26 +19,19 @@ usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  --node          Use simple Node.js container (no build required)"
     echo "  --rebuild       Force rebuild the DevContainer image"
     echo "  -h, --help      Show this help message"
     echo ""
     echo "Examples:"
     echo "  $0              Start DevContainer (build if needed)"
-    echo "  $0 --node       Start simple Node.js container"
     echo "  $0 --rebuild    Rebuild and start DevContainer"
 }
 
 # 引数解析
-USE_NODE=false
 REBUILD=false
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --node)
-            USE_NODE=true
-            shift
-            ;;
         --rebuild)
             REBUILD=true
             shift
@@ -67,17 +60,6 @@ if ! docker info >/dev/null 2>&1; then
     echo "${RED}❌ Error: Docker is not running.${RESET}"
     echo "Please start Docker (or Colima)."
     exit 1
-fi
-
-# Node.js コンテナを使用する場合
-if [ "$USE_NODE" = true ]; then
-    echo "${GREEN}Starting Node.js container...${RESET}"
-    echo "${YELLOW}Installing dependencies...${RESET}"
-    docker run -it --rm \
-        -v "$(pwd)":/workspace \
-        -w /workspace \
-        node:24-alpine sh -c "npm install --silent 2>/dev/null || true; echo 'Ready! Type exit to leave the container.'; exec sh -l"
-    exit 0
 fi
 
 # DevContainer を使用する場合
@@ -112,9 +94,8 @@ fi
 
 # コンテナを起動
 echo "${GREEN}Starting container...${RESET}"
-echo "${YELLOW}Installing dependencies...${RESET}"
 
 docker run -it --rm \
     -v "$(pwd)":/workspace \
     -w /workspace \
-    "$IMAGE_NAME" sh -c "npm install --silent 2>/dev/null || true; echo 'Ready! Type exit to leave the container.'; exec sh -l"
+    "$IMAGE_NAME" sh -l
