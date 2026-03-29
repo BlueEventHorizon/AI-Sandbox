@@ -17,7 +17,16 @@
       "Bash(colima status:*)",
       "Bash(docker build:*)",
       "Bash(docker run:*)",
-      "Skill(forge:start-implement)"
+      "Skill(forge:start-implement)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/marketplaces/bw-cc-plugins/plugins/forge/scripts/session_manager.py find --skill start-requirements 2>&1)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/marketplaces/bw-cc-plugins/plugins/forge/scripts/session_manager.py init \\\\\n  --skill start-requirements \\\\\n  --feature \"devcontainer\" \\\\\n  --mode \"interactive\" \\\\\n  --output-dir \"specs/requirements\" 2>&1)",
+      "Bash(docker image:*)",
+      "Bash(git rm:*)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.26/skills/review/scripts/resolve_review_context.py --type requirement specs/requirements/ 2>&1)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.26/scripts/session_manager.py find --skill review 2>&1)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.26/scripts/session_manager.py init \\\\\n  --skill review \\\\\n  --review-type \"requirement\" \\\\\n  --engine \"claude\" \\\\\n  --auto-count 0 \\\\\n  --current-cycle 0 2>&1)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.26/scripts/session/write_refs.py .claude/.temp/review-40bcb0)",
+      "Bash(/opt/homebrew/bin/python3 /Users/moons/.claude/plugins/cache/bw-cc-plugins/forge/0.0.26/skills/reviewer/scripts/extract_review_findings.py .claude/.temp/review-40bcb0 2>&1)"
     ]
   },
   "sandbox": {
