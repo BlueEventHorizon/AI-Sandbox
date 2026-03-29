@@ -1,17 +1,25 @@
 # doc_structure_version: 3.0
 
 rules:
-  root_dirs: []
-  doc_types_map: {}
+  root_dirs:
+    - rules/
+  doc_types_map:
+    rules/: rule
   patterns:
     target_glob: "**/*.md"
     exclude: []
 
 specs:
   root_dirs:
-    - specs/
+    - specs/requirements/
+    - specs/design/
+    - specs/plan/
+    - specs/references/
   doc_types_map:
-    specs/: spec
+    specs/requirements/: requirement
+    specs/design/: design
+    specs/plan/: plan
+    specs/references/: reference
   patterns:
     target_glob: "**/*.md"
     exclude: []
