@@ -4,8 +4,8 @@
 
 metadata:
   name: Project Specification Document Search Index
-  generated_at: 2026-03-22T06:56:30Z
-  file_count: 7
+  generated_at: 2026-03-28T05:32:46Z
+  file_count: 8
 
 docs:
   specs/app_overview_writing_standard.md:
@@ -47,164 +47,198 @@ docs:
       - external dependencies
       - risk management
       - deliverable specification
+  specs/design/DES-001_devcontainer_design.md:
+    doc_type: spec
+    title: AI DevContainer Design
+    purpose: Defines the overall architecture, component design, and implementation details for an Alpine Linux-based DevContainer with native AI tool binaries (Claude Code, OpenAI Codex)
+    content_details:
+      - Container architecture and component structure
+      - Dockerfile design with Alpine 3.21 base image and native binary installation
+      - devcontainer.json configuration for VS Code integration
+      - start-container.sh startup modes and container lifecycle
+      - install-devcontainer.sh installer for existing projects
+      - Makefile for macOS Docker environment setup
+      - Use case scenarios (VS Code, terminal, installation)
+      - Security risk assessment and mitigation strategies
+      - Unit and integration test design
+      - Colima memory requirements (4GiB minimum)
+    applicable_tasks:
+      - DevContainer implementation
+      - Dockerfile optimization
+      - AI tool integration in containers
+      - Container startup automation
+      - Project environment distribution
+    keywords:
+      - DevContainer
+      - Alpine Linux
+      - native binaries
+      - Claude Code
+      - Codex
+      - Dockerfile
+      - docker build
+      - VS Code integration
+      - container startup
+      - installation automation
   specs/requirements/APP-001_app_overview_spec.md:
     doc_type: spec
-    title: APP-001 AI DevContainer Application Overview Specification
-    purpose: Defines requirements, design, and implementation scope for a DevContainer environment with preinstalled AI coding assistants (Claude Code, Gemini CLI, OpenAI Codex)
+    title: AI DevContainer Application Overview Specification
+    purpose: Defines overall requirements, feature scope, use cases, and deployment scenarios for a DevContainer-based development environment with pre-installed AI coding assistants
     content_details:
-      - DevContainer base image (Alpine Linux Node.js) and container configuration
-      - Pre-installed AI assistant tools with installation methods
-      - Five usage scenarios covering setup and daily operations
-      - Success criteria for tool availability, environment reproducibility, and OS independence
-      - Scope boundaries including macOS Docker automation (Colima), exclusions of API key setup and CI/CD integration
-      - Platform and version requirements (Docker 20.10+, VS Code with DevContainers)
-      - External dependencies and risk mitigation strategies
-      - Constraints on Alpine Linux compatibility and Homebrew-based setup
+      - "Target platforms: macOS (Colima) and Linux (Docker Engine)"
+      - "Pre-installed AI tools: Claude Code and OpenAI Codex as native binaries"
+      - "Core features: VS Code integration, terminal access, macOS Docker setup automation, existing project installation"
+      - "Usage scenarios: macOS initial setup, Linux setup, repository-based development, existing project integration, daily usage"
+      - "Success criteria: AI tools immediately available, environment reproducibility, OS compatibility, existing project installation, macOS setup automation"
+      - "External dependencies: Claude installation script, OpenAI Codex releases, Homebrew, Docker Hub"
     applicable_tasks:
-      - DevContainer environment setup and configuration
-      - AI coding assistant tool integration and preinstallation verification
-      - macOS Docker environment automation (Colima + Buildx setup)
-      - Existing project DevContainer installation
-      - Container security configuration (non-root user setup)
-      - VS Code and terminal-based container launch options
+      - DevContainer environment setup
+      - AI assistant integration planning
+      - Project DevContainer installation
+      - Development environment configuration for macOS and Linux
+      - Documentation reference for feature scope and use cases
     keywords:
       - DevContainer
       - AI coding assistant
       - Claude Code
-      - Gemini CLI
       - OpenAI Codex
       - Colima
       - Docker
-      - Alpine Linux
-      - Node.js
       - VS Code
+      - Alpine Linux
+      - native binary
+      - existing project installation
   specs/requirements/FNC-001_devcontainer_environment_spec.md:
     doc_type: spec
     title: FNC-001 DevContainer Environment Setup Specification
-    purpose: Specifies requirements for automatic DevContainer environment setup with Alpine Linux, VS Code integration, and pre-installed AI coding assistants
+    purpose: Defines requirements for automatic Alpine Linux-based container environment setup with AI coding assistants preinstalled for VS Code DevContainers integration
     content_details:
-      - Alpine Linux-based Node.js container environment
-      - Non-root user execution
-      - AI coding assistants pre-installation (Gemini, Claude Code, OpenAI Codex)
-      - VS Code DevContainers extension integration
-      - Cross-platform support (macOS, Windows WSL2, Linux)
-      - Command availability validation
+      - Alpine Linux base image with non-root user execution
+      - Project root mounted as container workspace
+      - AI coding assistants preinstalled at image build time
+      - VS Code extension recommendations for Anthropic Claude Code
+      - Cross-platform support for macOS Intel/Apple Silicon and Linux x86_64
+      - Shell environment with PATH configured for claude and codex commands
+      - Error handling for missing Docker and DevContainers extension
     applicable_tasks:
-      - DevContainer environment setup
-      - Docker configuration validation
-      - AI coding assistant integration
-      - Cross-platform compatibility testing
+      - DevContainer environment setup and configuration
+      - AI assistant integration with VS Code
+      - Cross-platform Docker setup verification
+      - Container shell environment validation
     keywords:
       - DevContainer
       - Alpine Linux
-      - Docker
+      - container
+      - AI assistant
       - VS Code
-      - AI coding assistant
-      - Gemini
-      - Claude Code
-      - shell environment
+      - Docker
+      - preinstall
+      - non-root
+      - cross-platform
   specs/requirements/FNC-002_container_launch_spec.md:
     doc_type: spec
-    title: FNC-002 Container Launch Specification
-    purpose: Specifies requirements for launching containers from command line with automatic shell entry and AI coding assistant availability
+    title: Container Launch Specification (Console)
+    purpose: Defines requirements for launching and entering a DevContainer environment from command line using a startup script, with AI coding assistants pre-installed and immediately available
     content_details:
-      - Normal mode with automatic image building
-      - Simple mode with official Node.js image (--node flag)
-      - Rebuild mode for forced image rebuilding (--rebuild flag)
-      - Automatic shell entry and container cleanup on exit
-      - Volume mount of current directory to /workspace
+      - Normal launch mode and auto-build of missing images
+      - Rebuild mode (--rebuild flag) for forced image rebuild
+      - Automatic entry to container shell after startup
+      - Automatic container removal on exit (temporary use)
       - Help option display (-h, --help)
-      - Error handling for missing Docker, inactive Docker, missing Dockerfile, build failures, and unknown options
-      - "Platform constraint: bash script requires WSL 2 on Windows"
+      - Volume mounting of current directory to /workspace
+      - Real-time file synchronization between host and container
+      - Shell script implementation (sh) for macOS and Linux
+      - Error handling for Docker installation, startup, Dockerfile location, build failures, and invalid options
+      - Platform constraints
     applicable_tasks:
-      - Container startup implementation
-      - Launch script development
-      - Build mode selection implementation
-      - Error handling and validation
-      - Platform-specific execution setup
+      - DevContainer launch implementation
+      - Container startup script development
+      - Environment setup verification
+      - Docker integration testing
+      - Error handling implementation
     keywords:
-      - Docker
+      - container
+      - launch
       - DevContainer
-      - container launch
-      - shell entry
-      - image build
+      - startup script
+      - Docker
+      - shell
       - volume mount
       - error handling
-      - bash script
-      - WSL 2
+      - sh
+      - rebuild
   specs/requirements/FNC-003_ai_assistant_execution_spec.md:
     doc_type: spec
-    title: AI Coding Assistant Execution Specification
-    purpose: Specifies requirements for running Claude Code as the primary AI coding assistant in the container environment, with Gemini CLI as an MCP server and OpenAI Codex as a native binary
+    title: AI Coding Assistants Execution Specification
+    purpose: Specifies requirements for running Claude Code and OpenAI Codex as native binaries in container environment with API key management and security guidelines
     content_details:
-      - Claude Code native binary execution via claude command
-      - Gemini CLI as MCP server for Claude Code integration
-      - OpenAI Codex native binary execution via codex command
-      - Tool installation and version management via container image builds
-      - API key and authentication management via environment variables or config files
-      - Verification methods for each tool availability
-      - Error handling for missing tools, unset API keys, and MCP connection failures
+      - Supported AI assistants (Claude Code, OpenAI Codex)
+      - Direct command execution requirements
+      - Native binary installation in container image
+      - API key and authentication management
+      - Environment variable and configuration file security
+      - Git ignore requirements for credentials
+      - Error handling for missing tools and authentication
+      - Version management via container image rebuilds
     applicable_tasks:
-      - Container image setup and configuration
-      - AI assistant tool integration and verification
-      - Development environment deployment
-      - Security configuration for API key management
+      - Container environment setup
+      - AI assistant installation and configuration
+      - API authentication setup
+      - Container image building
+      - Development environment initialization
     keywords:
       - Claude Code
-      - Gemini CLI
       - OpenAI Codex
-      - MCP server
-      - container
-      - DevContainer
-      - AI assistant
       - native binary
-      - API key authentication
+      - API key
+      - authentication
+      - container environment
+      - .gitignore
+      - security
   specs/requirements/FNC-004_macos_docker_setup_spec.md:
     doc_type: spec
-    title: FNC-004 macOS Docker Environment Setup Requirements
-    purpose: Specifies requirements for automatic Docker environment setup on macOS using Colima as a Docker Desktop alternative
+    title: FNC-004 macOS Docker Setup Specification
+    purpose: Defines requirements for automated Docker environment setup on macOS using Colima as Docker Desktop alternative, including installation of Docker CLI, Colima, and Docker Buildx with architecture detection
     content_details:
-      - Installation of Docker CLI, Colima, and Docker Buildx via make install
-      - Support for both Intel Mac (x86_64) and Apple Silicon (arm64) architecture
-      - Uninstallation procedure via make uninstall
-      - Daily operation commands (colima start, colima stop)
-      - Error handling for unsupported platforms and missing prerequisites
-      - Automatic skip of already installed components
+      - Installation requirements for Docker CLI, Colima, and Docker Buildx
+      - Automatic architecture detection for Intel Mac and Apple Silicon
+      - Prerequisite of 4GiB or more memory allocation for Colima
+      - Uninstallation procedure for all components
+      - Daily operations (colima start/stop commands)
+      - Platform constraint for macOS only
+      - Error handling cases
     applicable_tasks:
-      - DevContainer setup verification for macOS
-      - Docker environment installation troubleshooting
-      - Container build process implementation
-      - CI/CD pipeline configuration for macOS
+      - macOS development environment setup
+      - Docker environment installation
+      - Architecture compatibility validation
+      - Container infrastructure management
     keywords:
-      - Docker CLI
+      - macOS
+      - Docker
       - Colima
+      - Docker Desktop alternative
+      - Docker CLI
       - Docker Buildx
-      - macOS setup
+      - architecture detection
       - Homebrew
   specs/requirements/FNC-005_install_to_existing_project_spec.md:
     doc_type: spec
-    title: FNC-005 Installation to Existing Project Specification
-    purpose: Defines requirements for installing AI DevContainer environment to existing projects, including installation steps, backup functionality, and confirmation prompts for file overwriting
+    title: Installation to Existing Project Specification
+    purpose: Specifies automatic installation process for adding AI DevContainer environment to existing projects
     content_details:
-      - Installation steps for .devcontainer directory, start-container.sh script, and Makefile
-      - Backup functionality with timestamp naming
-      - Confirmation prompts for existing files
-      - Mandatory file override rejection behavior
-      - Optional file override skip behavior
-      - Error handling cases for missing directory, no target specification, and rejection scenarios
+      - DevContainer directory copying
+      - start-container.sh script copying and permission setup
+      - Backup mechanism with timestamps
+      - Confirmation prompts for file overwriting
+      - Error cases handling
+      - Distinction between mandatory and optional files
     applicable_tasks:
-      - Installation script development
-      - DevContainer integration to existing projects
-      - Backup and recovery mechanism implementation
-      - User confirmation prompt implementation
-      - Error handling implementation
+      - Installation implementation
+      - Project setup in existing repositories
+      - DevContainer configuration migration
     keywords:
-      - install
+      - installation
       - DevContainer
-      - existing project
+      - setup
       - backup
-      - override
-      - confirmation
-      - Makefile
-      - start-container.sh
-      - error handling
+      - existing project
+      - configuration
