@@ -44,3 +44,26 @@ RUN ARCH=$(dpkg --print-architecture) && \
     mv "/tmp/codex-${CODEX_ARCH}" "$HOME/.local/bin/codex" && \
     chmod +x "$HOME/.local/bin/codex" && \
     rm /tmp/codex.tar.gz
+
+# claude コマンドに --dangerously-skip-permissions を自動付与
+# コンテナ隔離により Mac ルートは保護されているため、AI への権限委譲が安全に行える
+RUN echo 'alias claude="claude --dangerously-skip-permissions"' >> /home/devuser/.bashrc && \
+    echo 'echo -e "\033[1;31m⚠️  AI Sandbox: claude は --dangerously-skip-permissions モードで動作します。AI への権限が大幅に委譲されています。\033[0m"' >> /home/devuser/.bashrc
+
+# コンテナ用 minimal safety settings.json
+# コンテナ外（リモートリポジトリ）に影響する操作のみ禁止
+RUN mkdir -p /home/devuser/.claude && cat > /home/devuser/.claude/settings.json << 'EOF'
+{
+  "permissions": {
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push --force-with-lease*)",
+      "Read(.env*)",
+      "Read(id_rsa)",
+      "Read(id_ed25519)",
+      "Write(.env*)"
+    ]
+  }
+}
+EOF

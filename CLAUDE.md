@@ -57,6 +57,16 @@ codex --version
 colima status
 ```
 
+## コンテナ内の Claude Code 権限設計
+
+コンテナはホスト Mac のルートから隔離されているため、AI への権限を大幅に委譲している。
+
+- **`claude` コマンド**: `--dangerously-skip-permissions` が自動付与され、確認プロンプトなしで実行される
+- **禁止操作（コンテナ外に影響するもののみ）**:
+  - `git push --force` 系（リモートリポジトリの破壊）
+  - `.env*`・SSH 秘密鍵の読み書き
+- **ターゲットプロジェクトの `.claude/settings.json`**: `--dangerously-skip-permissions` によりバイパスされるため、そのままコンテナに持ち込んでも制約にならない
+
 ## 開発メモ
 
 - Docker ビルド時に Colima のメモリが 4GiB 以上必要（`colima start --memory 4`）
