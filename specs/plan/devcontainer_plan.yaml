@@ -51,7 +51,7 @@ tasks:
   - task_id: TASK-001
     title: Dockerfile 作成（Ubuntu 24.04 + Claude Code + Codex）
     priority: 95
-    status: pending
+    status: completed
     design_id: DES-001
     depends_on: []
     group_id: null
