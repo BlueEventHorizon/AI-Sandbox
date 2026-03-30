@@ -1,13 +1,14 @@
 # Phase 1 snapshot - used to replace .toc_checksums.yaml after merge
 # Auto-generated - do not edit
-generated_at: 2026-03-28T05:32:00Z
-file_count: 8
+generated_at: 2026-03-29T07:31:56Z
+file_count: 9
 checksums:
-  specs/app_overview_writing_standard.md: 818514220d13dd222d446f3e9091d1e172921a62d5d6ed4829ce05fcb2ec7e44
-  specs/design/DES-001_devcontainer_design.md: 7dfb6814e6d2ba369499ca03d6d90ef9d792fcf83705845fbb1d36acdaddcb47
-  specs/requirements/APP-001_app_overview_spec.md: 1d325daa3bc83c7fb15a2771f761bd5837b609ba529f9e8900d1f07f9151e4b5
-  specs/requirements/FNC-001_devcontainer_environment_spec.md: 36ad069ee31706bb4d1c6d8a963c00394f8373aab79fc29350a132e3917b9aee
-  specs/requirements/FNC-002_container_launch_spec.md: c9a58e1241de60e66c83d0e2ba29cd40369593849aa7e06f6bf67e32e1e1f1d3
-  specs/requirements/FNC-003_ai_assistant_execution_spec.md: 46ea39c547734a0cc969ca17f07cb9f3795e46c1246050981892b7eea47840e1
-  specs/requirements/FNC-004_macos_docker_setup_spec.md: 1e77be8d11c13662bb3ee96c644d22c61a32ee1fa0b785a264db7bdf66659b99
-  specs/requirements/FNC-005_install_to_existing_project_spec.md: 84d9e367808b5bff8782d747e57413569af3017ef9513ef9fd11a12f275e4fbb
+  specs/references/claude-code-devcontainer/README.md: cdb38f67fa308aed095bc359b4c5f3d4088ce3062fbbc9d0380be68bd18a1628
+  specs/references/devcontainer-features/README.md: 4b51fe79d853a450883e89ad02c348ce9d21207dab3fdcb83c6b74632f74ca38
+  specs/references/devcontainer-features/src/claude-code/NOTES.md: f1fe9962d311f92d034b92b86658650ab070a69d58f3bbb6b82274460d026e05
+  specs/references/devcontainer-features/src/claude-code/README.md: a3130080d342d4e84f9b88293372b2e572a4fec70cf512a8b41f0e1c453d3e39
+  specs/requirements/APP-001_app_overview_spec.md: 0ef98e802c954ccffff09431e23664c06f4d5cd257981a35789e85ce9aafdb11
+  specs/requirements/FNC-001_devcontainer_environment_spec.md: 2ac980961edd473017e5427bd7277115e335444f0b0cc9c63e0325dcdaa091ae
+  specs/requirements/FNC-002_container_launch_spec.md: 0e5f3cb9096d4d35169ce9559991065cc912e9a10a75e22b61c558ad9fe99025
+  specs/requirements/FNC-003_ai_assistant_execution_spec.md: 0bce377bbbb2eb8123a348b4a2ecfee7d56ecb15c9cc018f134283f1d2260c5a
+  specs/requirements/FNC-004_macos_docker_setup_spec.md: e9cf8de6a156e9d950a3fb477f31969a73b356837d32a5543747b3645716cf46

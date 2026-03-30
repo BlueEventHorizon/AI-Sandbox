@@ -97,7 +97,7 @@ tasks:
   - task_id: TASK-003
     title: "Phase 1 検証: ターミナルで Claude Code 動作確認"
     priority: 85
-    status: pending
+    status: completed
     design_id: DES-001
     depends_on:
       - TASK-001
