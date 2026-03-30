@@ -47,8 +47,9 @@ RUN ARCH=$(dpkg --print-architecture) && \
 
 # claude コマンドに --dangerously-skip-permissions を自動付与
 # コンテナ隔離により Mac ルートは保護されているため、AI への権限委譲が安全に行える
+# alias は .bashrc（インタラクティブシェル用）、警告は .profile（ログインシェルで確実に表示）に記載
 RUN echo 'alias claude="claude --dangerously-skip-permissions"' >> /home/devuser/.bashrc && \
-    echo 'echo -e "\033[1;31m⚠️  AI Sandbox: claude は --dangerously-skip-permissions モードで動作します。AI への権限が大幅に委譲されています。\033[0m"' >> /home/devuser/.bashrc
+    echo 'echo -e "\033[1;31m⚠️  AI Sandbox: claude は --dangerously-skip-permissions モードで動作します。AI への権限が大幅に委譲されています。\033[0m"' >> /home/devuser/.profile
 
 # コンテナ用 minimal safety settings.json
 # コンテナ外（リモートリポジトリ）に影響する操作のみ禁止
