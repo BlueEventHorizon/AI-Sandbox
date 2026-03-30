@@ -1,17 +1,10 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # AI Sandbox
 
 AI コーディングアシスタント（Claude Code、OpenAI Codex）をネイティブバイナリとしてプリインストールした Ubuntu 24.04 ベースの Docker コンテナ環境。
-
-## プロジェクト構成
-
-```
-.devcontainer/
-  Dockerfile          # Ubuntu 24.04 + Claude Code + Codex
-  devcontainer.json   # VS Code DevContainer 設定
-setup-sandbox.sh      # エントリポイント（ターミナル起動 / VS Code 配置）
-Makefile              # macOS Docker 環境セットアップ（Colima）
-specs/                # 要件定義書・設計書・計画書
-```
 
 ## アーキテクチャ
 
@@ -46,8 +39,27 @@ specs/                # 要件定義書・設計書・計画書
 make install
 ```
 
+## CI/CD
+
+- `.github/workflows/claude.yml`: Issue/PR で `@claude` メンションすると Claude Code が自動応答する GitHub Actions ワークフロー
+
+## 検証コマンド
+
+```bash
+# Docker イメージのビルド
+docker build -t ai-sandbox .devcontainer/
+
+# コンテナ内でツールの動作確認
+claude --version
+codex --version
+
+# macOS: Colima の状態確認
+colima status
+```
+
 ## 開発メモ
 
 - Docker ビルド時に Colima のメモリが 4GiB 以上必要（`colima start --memory 4`）
 - `curl | bash`（Claude Code インストーラー）は Anthropic 公式がサポートする唯一のネイティブインストール方法
 - Codex は GitHub Releases から glibc バイナリを直接取得
+- 仕様書は `specs/` 配下（requirements/ design/ plan/）に格納。変更時は関連する仕様書との整合性を確認すること

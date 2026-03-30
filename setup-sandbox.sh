@@ -152,8 +152,8 @@ if [[ "${REBUILD}" == true ]] || [[ "${IMAGE_EXISTS}" == false ]]; then
     fi
 fi
 
-# プロジェクト名（Volume 命名用）
-PROJECT_NAME="$(basename "${TARGET_PATH}")"
+# プロジェクト名（Volume 命名用: basename + フルパスハッシュで一意性を確保）
+PROJECT_NAME="$(basename "${TARGET_PATH}")-$(echo -n "${TARGET_PATH}" | shasum -a 256 | cut -c1-8)"
 VOLUME_NAME="${IMAGE_NAME}-claude-${PROJECT_NAME}"
 
 # コンテナ起動
