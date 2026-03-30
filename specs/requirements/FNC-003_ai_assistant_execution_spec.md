@@ -48,11 +48,20 @@
 | ツールがインストールされていない場合 | コマンドが見つからないエラーを表示する（イメージの再ビルドが必要） |
 | API キーが未設定の場合 | 各ツール固有の認証エラーを表示する |
 
+### Claude Code 認証永続化要件
+
+コンテナ終了・再起動を跨いで Claude Code の認証情報が保持されること（毎回のログインが不要）。実現のための要件:
+
+- `~/.claude/` を Docker Named Volume でマウントすること
+- `CLAUDE_CONFIG_DIR=/home/devuser/.claude` を設定し、`.claude.json`（OAuth セッション状態）が Named Volume 内に書き込まれること
+  - 未設定の場合、Claude Code はコンテナのホームディレクトリ直下（Named Volume 範囲外）に `.claude.json` を書き込み、コンテナ終了時に認証情報が失われる（公式 Issue [#14313](https://github.com/anthropics/claude-code/issues/14313)）
+- `--hostname ai-sandbox` でコンテナのホスト名を固定すること（ランダムホスト名では認証トークンが無効と判定される場合がある）
+
 ## 未確定事項
 
 | ID | 内容 | 期限 |
 | --- | --- | --- |
-| TBD-001 | Claude Code のコンテナ内での認証フロー（初回ログイン時の対話ウィザードがコンテナ環境で正常に動作するか） | Phase 1 検証時 |
+| （なし） | TBD-001 は解決済み（2026-03-30）。`CLAUDE_CONFIG_DIR` と `--hostname` で認証永続化を実現 | — |
 
 ## 変更履歴
 
@@ -60,3 +69,4 @@
 | --- | --- | --- |
 | 2026-03-21 | AI | 既存ソースコードから初版作成 |
 | 2026-03-29 | AI | 全面書き換え: Ubuntu ベース、Claude Code コンテナ内復帰、セキュリティ要件強化 |
+| 2026-03-30 | AI | TBD-001 解決: `CLAUDE_CONFIG_DIR` と `--hostname` による認証永続化要件を追記 |

@@ -159,9 +159,11 @@ VOLUME_NAME="${IMAGE_NAME}-claude-${PROJECT_NAME}"
 # コンテナ起動
 echo "コンテナを起動します: ${TARGET_PATH}"
 docker run -it --rm \
+    --hostname ai-sandbox \
     -v "${TARGET_PATH}:/workspace" \
     -v "${VOLUME_NAME}:/home/devuser/.claude" \
     -w /workspace \
+    -e CLAUDE_CONFIG_DIR=/home/devuser/.claude \
     -e OPENAI_API_KEY \
     -e ANTHROPIC_API_KEY \
     "${IMAGE_NAME}" bash -l

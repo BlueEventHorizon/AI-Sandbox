@@ -198,7 +198,7 @@ sequenceDiagram
         Docker-->>Script: ビルド完了
     end
 
-    Script->>Docker: docker run -it --rm<br>-v ~/projects/my-app:/workspace<br>-v ai-sandbox-claude:/home/devuser/.claude<br>ai-sandbox bash -l
+    Script->>Docker: docker run -it --rm<br>--hostname ai-sandbox<br>-v ~/projects/my-app:/workspace<br>-v ai-sandbox-claude-my-app-{hash}:/home/devuser/.claude<br>-e CLAUDE_CONFIG_DIR=/home/devuser/.claude<br>ai-sandbox bash -l
     Docker-->>User: コンテナ内シェル（/workspace $）
     Note over User,Docker: ターゲットプロジェクトが /workspace にマウントされている<br>~/.claude は Named Volume で永続化
     User->>Docker: exit
@@ -230,9 +230,13 @@ sequenceDiagram
 
 ```bash
 docker run -it --rm \
+    --hostname ai-sandbox \
     -v "${TARGET_PATH}:/workspace" \
     -v "ai-sandbox-claude-${PROJECT_NAME}:/home/devuser/.claude" \
     -w /workspace \
+    -e CLAUDE_CONFIG_DIR=/home/devuser/.claude \
+    -e OPENAI_API_KEY \
+    -e ANTHROPIC_API_KEY \
     ai-sandbox bash -l
 ```
 
@@ -240,8 +244,10 @@ docker run -it --rm \
 | --- | --- |
 | `-it` | 対話的ターミナル |
 | `--rm` | コンテナ終了時に自動削除 |
+| `--hostname ai-sandbox` | ホスト名を固定。ランダムホスト名では再起動ごとに Claude Code が認証を無効と判定する場合があるため固定値を使用 |
 | `-v ${TARGET_PATH}:/workspace` | ターゲットプロジェクトを bind mount（Docker の bind mount はファイルシステムレベルで即時双方向同期。FNC-002 のリアルタイム同期要件を充足する） |
 | `-v ai-sandbox-claude-${PROJECT_NAME}:/home/devuser/.claude` | Claude Code 認証情報を Named Volume で永続化（FNC-002 データ永続化要件） |
+| `-e CLAUDE_CONFIG_DIR=/home/devuser/.claude` | Claude Code の設定ディレクトリを明示的に指定。未設定の場合、`~/.claude.json`（OAuth セッション状態）が Named Volume 外のホームディレクトリに書き込まれ認証が失われる（公式 Issue [#14313](https://github.com/anthropics/claude-code/issues/14313)） |
 | `-e OPENAI_API_KEY` | ホストの `$OPENAI_API_KEY` をコンテナに転送（Codex の API 認証用。未設定の場合は何も渡されない） |
 | `-e ANTHROPIC_API_KEY` | ホストの `$ANTHROPIC_API_KEY` をコンテナに転送（Claude Code が API キー認証を使用する場合。OAuth 認証の場合は不要） |
 | `-w /workspace` | ワーキングディレクトリ |
@@ -251,7 +257,7 @@ docker run -it --rm \
 
 `docker run -e VAR_NAME`（値なし）の形式で、ホスト側の同名環境変数をコンテナに転送する。ホスト側で未設定の場合は何も渡されず、各ツール固有の認証エラーとなる（ユーザーの責務）。
 
-- **Claude Code**: 主に `~/.claude/` の OAuth 認証を使用（Volume で永続化済み）。API キー認証を使用する場合は `ANTHROPIC_API_KEY` を転送
+- **Claude Code**: 主に `~/.claude/` の OAuth 認証を使用（Volume + `CLAUDE_CONFIG_DIR` で永続化）。API キー認証を使用する場合は `ANTHROPIC_API_KEY` を転送
 - **Codex**: `OPENAI_API_KEY` 環境変数で認証
 
 **`.gitignore` について:** AI Sandbox リポジトリの `.gitignore` には `.env` が含まれている。ターゲットプロジェクトの `.gitignore` 管理は本プロジェクトの責務外。
@@ -261,12 +267,16 @@ docker run -it --rm \
 Named Volume 名にプロジェクト名を含めることで、プロジェクトごとに独立した Claude Code 設定を保持する。
 
 ```
-ai-sandbox-claude-{PROJECT_NAME}
+ai-sandbox-claude-{basename}-{path-hash}
 ```
 
-`PROJECT_NAME` はターゲットパスの末尾ディレクトリ名から生成する（例: `~/projects/my-app` → `my-app`）。
+`basename` はターゲットパスの末尾ディレクトリ名、`path-hash` はターゲットの絶対パスの SHA-256 先頭8文字（例: `~/projects/my-app` → `my-app-a1b2c3d4`）。
 
-**Volume 名の衝突回避:** 異なるパスに同名のディレクトリが存在する場合（例: `~/projects/my-app` と `~/work/my-app`）、同一の Volume が共有されてしまう。これは既知の制約として許容する。衝突を完全に回避するにはパスのハッシュ値を使う方式があるが、Volume の可読性が失われるため採用しない。
+```bash
+PROJECT_NAME="$(basename "${TARGET_PATH}")-$(echo -n "${TARGET_PATH}" | shasum -a 256 | cut -c1-8)"
+```
+
+**衝突回避の設計:** `basename` のみでは異なるパスに同名ディレクトリが存在する場合に同一 Volume が共有される問題があったため、フルパスのハッシュを付与して一意性を確保した。`basename` を残すことで `docker volume ls` 時の人間による識別を維持している。
 
 **エラーハンドリング:**
 
@@ -425,3 +435,4 @@ sequenceDiagram
 | 日付 | バージョン | 内容 |
 | --- | --- | --- |
 | 2026-03-29 | 1.0 | 初版作成。Ubuntu 24.04 ベース、setup-sandbox.sh 統合エントリポイント、Named Volume 永続化 |
+| 2026-03-30 | 1.1 | 認証永続化の設計を更新: `CLAUDE_CONFIG_DIR`・`--hostname` 追加、Volume 命名にフルパスハッシュを採用 |
