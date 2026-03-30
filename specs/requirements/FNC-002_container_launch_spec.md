@@ -63,7 +63,7 @@
 
 ### プラットフォーム制約
 
-- `setup-sandbox.sh` はシェルスクリプト（sh）であり、macOS および Linux で動作する
+- `setup-sandbox.sh` はシェルスクリプト（bash、`#!/bin/bash`）であり、macOS および Linux で動作する
 
 ### エラーケース
 

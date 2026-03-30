@@ -160,6 +160,8 @@ DOCKERFILE_PATH="${SCRIPT_DIR}/.devcontainer/Dockerfile"
 
 これにより、ユーザーがどのディレクトリから実行しても正しく Dockerfile を参照できる。
 
+**シェル言語:** `#!/bin/bash`（bash 固有機能を使用するため。macOS / Linux ともに bash は標準で利用可能）
+
 **コマンド構文:**
 
 ```
@@ -238,10 +240,21 @@ docker run -it --rm \
 | --- | --- |
 | `-it` | 対話的ターミナル |
 | `--rm` | コンテナ終了時に自動削除 |
-| `-v ${TARGET_PATH}:/workspace` | ターゲットプロジェクトを bind mount |
+| `-v ${TARGET_PATH}:/workspace` | ターゲットプロジェクトを bind mount（Docker の bind mount はファイルシステムレベルで即時双方向同期。FNC-002 のリアルタイム同期要件を充足する） |
 | `-v ai-sandbox-claude-${PROJECT_NAME}:/home/devuser/.claude` | Claude Code 認証情報を Named Volume で永続化（FNC-002 データ永続化要件） |
+| `-e OPENAI_API_KEY` | ホストの `$OPENAI_API_KEY` をコンテナに転送（Codex の API 認証用。未設定の場合は何も渡されない） |
+| `-e ANTHROPIC_API_KEY` | ホストの `$ANTHROPIC_API_KEY` をコンテナに転送（Claude Code が API キー認証を使用する場合。OAuth 認証の場合は不要） |
 | `-w /workspace` | ワーキングディレクトリ |
 | `bash -l` | ログインシェル（`~/.profile` を読み込む） |
+
+**環境変数転送の設計:**
+
+`docker run -e VAR_NAME`（値なし）の形式で、ホスト側の同名環境変数をコンテナに転送する。ホスト側で未設定の場合は何も渡されず、各ツール固有の認証エラーとなる（ユーザーの責務）。
+
+- **Claude Code**: 主に `~/.claude/` の OAuth 認証を使用（Volume で永続化済み）。API キー認証を使用する場合は `ANTHROPIC_API_KEY` を転送
+- **Codex**: `OPENAI_API_KEY` 環境変数で認証
+
+**`.gitignore` について:** AI Sandbox リポジトリの `.gitignore` には `.env` が含まれている。ターゲットプロジェクトの `.gitignore` 管理は本プロジェクトの責務外。
 
 **Volume 命名規則:**
 
@@ -296,18 +309,33 @@ ai-sandbox-claude-{PROJECT_NAME}
 | --- | --- | --- |
 | `remoteUser` | `devuser` | Dockerfile で作成した非 root ユーザー |
 | `postCreateCommand` | なし | 全ツールがイメージにプリインストール済み |
+| DevContainer 再オープン提案 | `.devcontainer/` の存在のみで VS Code がデフォルトで提案する | 追加実装不要。FNC-001 の要件は `.devcontainer/devcontainer.json` の配置で自動的に充足される |
 | Named Volume | `ai-sandbox-claude-${localWorkspaceFolderBasename}` | Claude Code 認証情報の永続化。プロジェクトごとに独立 |
-| VS Code 拡張 | `Anthropic.claude-code` のみ | Claude Code の VS Code 拡張を自動推奨 |
+| VS Code 拡張 | `Anthropic.claude-code` のみ | Claude Code の VS Code 拡張を自動推奨。Codex は CLI ツールであり公式 VS Code 拡張が存在しないため含めない |
 
 ### 3.5 Makefile 設計
 
-既存の Makefile 設計は要件を満たしており、**変更なし**。
+既存の Makefile に **Colima 起動時のメモリ割り当てを 4GiB に変更**する修正を加える。
 
-| ターゲット | 処理 |
-| --- | --- |
-| `install` | Docker CLI + Colima + Buildx をインストールし Colima を起動 |
-| `uninstall` | 全コンポーネントをアンインストール |
-| `help` | 利用可能なターゲットを表示 |
+| ターゲット | 処理 | 変更点 |
+| --- | --- | --- |
+| `install` | Docker CLI + Colima + Buildx をインストールし Colima を起動 | `colima start` → `colima start --memory 4` に変更 |
+| `uninstall` | 全コンポーネントをアンインストール | 変更なし |
+| `help` | 利用可能なターゲットを表示 | 変更なし |
+
+**設計判断:** Claude Code インストーラーが Docker ビルド時に大量のメモリを消費するため、Colima のデフォルトメモリ（2GiB）ではビルドが失敗する。`make install` で自動的に 4GiB を確保することで、ユーザーが手動でメモリ指定する必要をなくす。
+
+### 3.6 モジュール間共有定数
+
+以下の値が Dockerfile・setup-sandbox.sh・devcontainer.json で暗黙的に共有される。変更する場合は全ファイルを同時に更新する必要がある。
+
+| 定数 | 値 | 使用箇所 |
+| --- | --- | --- |
+| ユーザー名 | `devuser` | Dockerfile（`adduser`）、devcontainer.json（`remoteUser`） |
+| イメージ名 | `ai-sandbox` | setup-sandbox.sh（`docker build -t`、`docker run`） |
+| ワークスペースパス | `/workspace` | Dockerfile（`mkdir`）、setup-sandbox.sh（`-v ...:/workspace`）、devcontainer.json |
+| Claude Code 設定パス | `/home/devuser/.claude` | setup-sandbox.sh（Named Volume マウント先）、devcontainer.json（`mounts`） |
+| Volume 名プレフィックス | `ai-sandbox-claude-` | setup-sandbox.sh、devcontainer.json |
 
 ## 4. ユースケース設計
 
@@ -343,6 +371,21 @@ sequenceDiagram
 | --- | --- | --- | --- |
 | Makefile | `Makefile` | macOS Docker セットアップ | 変更なし |
 | MAKEFILE_GUIDE.md | `MAKEFILE_GUIDE.md` | Makefile の解説 | Colima メモリ要件の追記が必要 |
+
+**Trail of Bits 参考実装との差分（採否判断）:**
+
+| Trail of Bits の要素 | 本設計での採否 | 理由 |
+| --- | --- | --- |
+| `bubblewrap`（サンドボックス支援） | ❌ 不採用 | Claude Code 自身のサンドボックス機能を使用。追加の隔離層は本プロジェクトのスコープ外 |
+| `init: true`（PID 1 問題対策） | ❌ 不採用 | 対話的な短期間利用（`--rm`）であり、シグナル伝播の問題は実用上発生しにくい |
+| zsh / Oh My Zsh | ❌ 不採用 | bash で十分。シンプルさを優先 |
+| Python / uv | ❌ 不採用 | Python ランタイムは本プロジェクトのスコープ外 |
+| 認証トークン転送（`post_install.py`） | ❌ 不採用 | Claude Code の対話的認証 + Named Volume 永続化で対応。トークン管理の複雑さを避ける |
+| iptables ネットワーク制限 | ❌ 不採用 | 汎用開発用途では過度な制限。セキュリティ監査向けの Trail of Bits とはユースケースが異なる |
+| tmux / fzf / delta | ❌ 不採用 | 開発支援ツールの提供は本プロジェクトのスコープ外。ユーザーが必要に応じてインストール |
+| `NODE_OPTIONS=--max-old-space-size` | ❌ 不採用 | npm / Node.js を使用しない方針 |
+| `--cap-add=NET_ADMIN,NET_RAW` | ❌ 不採用 | iptables 不採用のため不要 |
+| `SHELL ["/bin/bash", "-o", "pipefail", "-c"]` | ✅ 採用 | Dockerfile の RUN 命令で pipefail を有効化 |
 
 **参考実装（設計のモデルとして参照。コードの直接再利用はしない）:**
 
