@@ -71,7 +71,7 @@ tasks:
   - task_id: TASK-002
     title: setup-sandbox.sh 作成（ターミナル起動）
     priority: 90
-    status: pending
+    status: completed
     design_id: DES-001
     depends_on:
       - TASK-001
