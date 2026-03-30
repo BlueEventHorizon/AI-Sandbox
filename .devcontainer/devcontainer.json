@@ -1,0 +1,17 @@
+{
+  "name": "AI Sandbox",
+  "build": {
+    "dockerfile": "./Dockerfile"
+  },
+  "remoteUser": "devuser",
+  "mounts": [
+    "source=ai-sandbox-claude-${localWorkspaceFolderBasename},target=/home/devuser/.claude,type=volume"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Anthropic.claude-code"
+      ]
+    }
+  }
+}

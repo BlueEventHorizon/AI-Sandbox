@@ -123,7 +123,7 @@ tasks:
   - task_id: TASK-004
     title: "devcontainer.json 作成 + setup-sandbox.sh --vscode 対応"
     priority: 70
-    status: pending
+    status: completed
     design_id: DES-001
     depends_on:
       - TASK-003
