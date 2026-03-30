@@ -16,7 +16,7 @@ AI コーディングアシスタント（Claude Code、OpenAI Codex）を Docke
 
 ```bash
 # このリポジトリをクローン
-git clone <repository-url> && cd AI-DevContainer
+git clone <repository-url> && cd AI-Sandbox
 
 # Docker 環境をセットアップ（Docker + Colima + Buildx をインストール）
 make install
