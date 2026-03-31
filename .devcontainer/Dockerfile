@@ -5,11 +5,21 @@ FROM ubuntu:24.04
 # pipefail を有効化（パイプの途中で失敗しても検出する）
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# 必要パッケージのインストール
+# curl/ca-certificates を先行インストール（gh リポジトリ鍵取得に必要）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# gh (GitHub CLI) 公式 apt リポジトリ追加 + 全パッケージ一括インストール
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      -o /usr/share/keyrings/githubcli-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+      > /etc/apt/sources.list.d/github-cli.list && \
+    apt-get update && apt-get install -y --no-install-recommends \
     git \
+    gh \
+    python3 \
     ripgrep \
     bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*

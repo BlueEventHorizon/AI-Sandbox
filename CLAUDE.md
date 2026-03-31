@@ -52,6 +52,8 @@ docker build -t ai-sandbox .devcontainer/
 # コンテナ内でツールの動作確認
 claude --version
 codex --version
+gh --version
+python3 --version
 
 # macOS: Colima の状態確認
 colima status

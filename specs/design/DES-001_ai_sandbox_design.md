@@ -80,7 +80,8 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    A["FROM ubuntu:24.04"] --> B["RUN apt-get update && apt-get install\ncurl git ripgrep bash ca-certificates"]
+    A["FROM ubuntu:24.04"] --> A2["RUN apt-get install curl ca-certificates"]
+    A2 --> B["RUN gh リポジトリ追加 + apt-get install\ngit gh python3 ripgrep bash"]
     B --> C["RUN adduser --disabled-password devuser\nmkdir /workspace"]
     C --> D["USER devuser"]
     D --> E["RUN curl ... | bash\n(Claude Code インストール)"]
@@ -126,7 +127,7 @@ Dockerfile 内の `curl | bash` や `curl | tar` が失敗した場合、`set -e
 **Dockerfile の具体的な処理フロー:**
 
 1. Ubuntu 24.04 をベースイメージとする
-2. 必要パッケージ（curl, git, ripgrep, bash, ca-certificates）をインストール
+2. curl, ca-certificates を先行インストールし、gh (GitHub CLI) 公式 apt リポジトリを追加。git, gh, python3, ripgrep, bash を一括インストール
 3. 非 root ユーザー `devuser` を作成し、`/workspace` ディレクトリの所有権を付与
 4. `devuser` に切り替え
 5. Claude Code を公式インストーラーでインストール（`~/.local/bin/claude` に配置される）
@@ -389,7 +390,8 @@ sequenceDiagram
 | `bubblewrap`（サンドボックス支援） | ❌ 不採用 | Claude Code 自身のサンドボックス機能を使用。追加の隔離層は本プロジェクトのスコープ外 |
 | `init: true`（PID 1 問題対策） | ❌ 不採用 | 対話的な短期間利用（`--rm`）であり、シグナル伝播の問題は実用上発生しにくい |
 | zsh / Oh My Zsh | ❌ 不採用 | bash で十分。シンプルさを優先 |
-| Python / uv | ❌ 不採用 | Python ランタイムは本プロジェクトのスコープ外 |
+| Python 3（ランタイムのみ） | ✅ 採用 | AI アシスタントがスクリプト実行に使用。pip / uv / フレームワークは含めない |
+| gh (GitHub CLI) | ✅ 採用 | AI アシスタントが PR 作成・Issue 操作等に使用。公式 apt リポジトリから取得 |
 | 認証トークン転送（`post_install.py`） | ❌ 不採用 | Claude Code の対話的認証 + Named Volume 永続化で対応。トークン管理の複雑さを避ける |
 | iptables ネットワーク制限 | ❌ 不採用 | 汎用開発用途では過度な制限。セキュリティ監査向けの Trail of Bits とはユースケースが異なる |
 | tmux / fzf / delta | ❌ 不採用 | 開発支援ツールの提供は本プロジェクトのスコープ外。ユーザーが必要に応じてインストール |
@@ -413,6 +415,8 @@ sequenceDiagram
 | Dockerfile ビルド | イメージが正常にビルドできること | `docker build` の終了コード 0 |
 | Claude Code 動作 | `claude --help` が動作すること | コンテナ内で実行、終了コード 0 |
 | Codex 動作 | `codex --help` が動作すること | コンテナ内で実行、終了コード 0 |
+| gh 動作 | `gh --version` が動作すること | コンテナ内で実行、終了コード 0 |
+| python3 動作 | `python3 --version` が動作すること | コンテナ内で実行、終了コード 0 |
 | PATH 設定 | `which claude && which codex` が成功すること | コンテナ内で実行 |
 | setup-sandbox.sh --help | ヘルプが表示されること | 標準出力の確認 |
 | setup-sandbox.sh（存在しないパス） | エラーを表示して終了コード 1 | |
@@ -436,3 +440,4 @@ sequenceDiagram
 | --- | --- | --- |
 | 2026-03-29 | 1.0 | 初版作成。Ubuntu 24.04 ベース、setup-sandbox.sh 統合エントリポイント、Named Volume 永続化 |
 | 2026-03-30 | 1.1 | 認証永続化の設計を更新: `CLAUDE_CONFIG_DIR`・`--hostname` 追加、Volume 命名にフルパスハッシュを採用 |
+| 2026-03-30 | 1.2 | 標準ツール追加: gh (GitHub CLI)、python3 をプリインストール対象に変更 |
