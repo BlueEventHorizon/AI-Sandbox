@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install uninstall detect-platform check-docker check-colima check-buildx
+.PHONY: help install uninstall detect-platform check-docker check-colima check-buildx fix-colima-locks
 
 # 色定義
 YELLOW := \033[33m
@@ -25,8 +25,26 @@ detect-platform:
 		exit 1; \
 	fi
 
+# Colima/Lima の stale なディスクロックを検出・削除
+# Mac のスリープ・強制再起動・クラッシュ後にロックが残り起動不能になる問題への対策
+fix-colima-locks:
+	@for lock in $(HOME)/.colima/_lima/_disks/*/in_use_by; do \
+		[ -e "$$lock" ] || continue; \
+		target=$$(readlink "$$lock" 2>/dev/null || true); \
+		if [ -z "$$target" ]; then \
+			printf "$(YELLOW)不正なロックを削除: $$lock$(RESET)\n"; \
+			rm -f "$$lock"; \
+			continue; \
+		fi; \
+		pid_file="$$target/pid"; \
+		if [ ! -f "$$pid_file" ] || ! kill -0 $$(cat "$$pid_file" 2>/dev/null) 2>/dev/null; then \
+			printf "$(YELLOW)Stale なロックを削除: $$lock$(RESET)\n"; \
+			rm -f "$$lock"; \
+		fi; \
+	done
+
 # メイン: Colima, Docker, Buildx のセットアップ
-install: detect-platform check-docker check-colima check-buildx
+install: detect-platform check-docker check-colima check-buildx fix-colima-locks
 	@printf "$(YELLOW)Starting Colima...$(RESET)\n"
 	@if colima status &>/dev/null; then \
 		printf "$(YELLOW)Colima is already running.$(RESET)\n"; \

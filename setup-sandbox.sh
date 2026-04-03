@@ -122,7 +122,7 @@ fi
 # Docker 起動確認
 if ! docker info > /dev/null 2>&1; then
     echo "エラー: Docker が起動していません。" >&2
-    echo "macOS の場合: colima start --memory 4 を実行してください。" >&2
+    echo "macOS の場合: make install を実行してください（Colima のロック修復も自動で行います）。" >&2
     exit 1
 fi
 
