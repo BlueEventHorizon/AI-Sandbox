@@ -136,7 +136,7 @@ Dockerfile 内の `curl | bash` や `curl | tar` が失敗した場合、`set -e
 
 **Colima メモリ要件:**
 
-Claude Code インストーラーが Docker ビルド時にメモリを消費するため、macOS（Colima）では **4GiB 以上のメモリ割り当て**が必要（`colima start --memory 4`）。2GiB ではインストーラーが Kill される。
+Claude Code インストーラーが Docker ビルド時にメモリを消費し、実行時も Claude Code プロセスが大量のメモリを使用するため、macOS（Colima）では **8GiB 以上のメモリ割り当て**が必要（`colima start --memory 8`）。4GiB ではビルドは成功するが実行時に OOM Kill される場合がある。
 
 ### 3.3 setup-sandbox.sh 設計
 
@@ -326,15 +326,15 @@ PROJECT_NAME="$(basename "${TARGET_PATH}")-$(echo -n "${TARGET_PATH}" | shasum -
 
 ### 3.5 Makefile 設計
 
-既存の Makefile に **Colima 起動時のメモリ割り当てを 4GiB に変更**する修正を加える。
+既存の Makefile に **Colima 起動時のメモリ割り当てを 8GiB に変更**する修正を加える。
 
 | ターゲット | 処理 | 変更点 |
 | --- | --- | --- |
-| `install` | Docker CLI + Colima + Buildx をインストールし Colima を起動 | `colima start` → `colima start --memory 4` に変更 |
+| `install` | Docker CLI + Colima + Buildx をインストールし Colima を起動 | `colima start` → `colima start --memory 8` に変更 |
 | `uninstall` | 全コンポーネントをアンインストール | 変更なし |
 | `help` | 利用可能なターゲットを表示 | 変更なし |
 
-**設計判断:** Claude Code インストーラーが Docker ビルド時に大量のメモリを消費するため、Colima のデフォルトメモリ（2GiB）ではビルドが失敗する。`make install` で自動的に 4GiB を確保することで、ユーザーが手動でメモリ指定する必要をなくす。
+**設計判断:** Claude Code はビルド時・実行時ともに大量のメモリを消費するため、Colima のデフォルトメモリ（2GiB）ではビルドが失敗し、4GiB でも実行時に OOM Kill される場合がある。`make install` で自動的に 8GiB を確保することで安定動作を保証する。
 
 ### 3.6 モジュール間共有定数
 
@@ -432,7 +432,7 @@ sequenceDiagram
 | VS Code E2E | `setup-sandbox.sh --vscode <パス>` → VS Code「Reopen in Container」→ `claude --help` |
 | Volume 永続化 | コンテナ起動 → Claude Code 認証 → `exit` → 再起動 → 認証が保持されていること |
 | 複数プロジェクト | 2つのターミナルで別プロジェクトを同時起動し、互いに干渉しないこと |
-| macOS フルセットアップ | `make install` → `colima start --memory 4` → `docker build` → `setup-sandbox.sh` → `claude --help` |
+| macOS フルセットアップ | `make install` → `colima start --memory 8` → `docker build` → `setup-sandbox.sh` → `claude --help` |
 
 ## 改定履歴
 

@@ -22,4 +22,4 @@ specs:
     specs/references/: reference
   patterns:
     target_glob: "**/*.md"
-    exclude: []
+    exclude: [plan]

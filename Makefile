@@ -49,7 +49,7 @@ install: detect-platform check-docker check-colima check-buildx fix-colima-locks
 	@if colima status &>/dev/null; then \
 		printf "$(YELLOW)Colima is already running.$(RESET)\n"; \
 	else \
-		if colima start --memory 4; then \
+		if colima start --memory 8; then \
 			printf "$(YELLOW)Colima started successfully.$(RESET)\n"; \
 		else \
 			printf "$(RED)❌ Failed to start Colima.$(RESET)\n"; \

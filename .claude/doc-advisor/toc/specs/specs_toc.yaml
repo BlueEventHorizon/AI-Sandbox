@@ -228,7 +228,7 @@ docs:
       - Docker CLI installation via Homebrew
       - Colima container runtime setup and configuration
       - Docker Buildx multi-architecture build support
-      - Memory requirement of 4GiB or more for Colima
+      - Memory requirement of 8GiB or more for Colima
       - Architecture detection for Intel Mac x86_64 and Apple Silicon arm64
       - Uninstall requirements including Colima and Buildx cleanup
       - Daily operations colima start and stop commands

@@ -71,7 +71,7 @@ colima status
 
 ## 開発メモ
 
-- Docker ビルド時に Colima のメモリが 4GiB 以上必要（`colima start --memory 4`）
+- Docker ビルド時に Colima のメモリが 8GiB 以上必要（`colima start --memory 8`）
 - `curl | bash`（Claude Code インストーラー）は Anthropic 公式がサポートする唯一のネイティブインストール方法
 - Codex は GitHub Releases から glibc バイナリを直接取得
 - 仕様書は `specs/` 配下（requirements/ design/ plan/）に格納。変更時は関連する仕様書との整合性を確認すること

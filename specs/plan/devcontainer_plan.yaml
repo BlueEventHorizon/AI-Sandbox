@@ -150,9 +150,9 @@ tasks:
     group_id: null
     build_check: skip
     description:
-      - Makefile の colima start を colima start --memory 4 に変更（DES-001 §3.5）
+      - Makefile の colima start を colima start --memory 8 に変更（DES-001 §3.5）
       - MAKEFILE_GUIDE.md に Colima メモリ要件の説明を追記
-    acceptance_criteria: "make install で Colima が 4GiB メモリで起動すること"
+    acceptance_criteria: "make install で Colima が 8GiB メモリで起動すること"
     required_reading:
       - specs/design/DES-001_ai_sandbox_design.md
       - specs/requirements/FNC-004_macos_docker_setup_spec.md
